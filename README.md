@@ -1,124 +1,237 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <img src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/NestJS-Dark.svg" width="80" alt="NestJS" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/SQLite.svg" width="80" alt="SQLite" />
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+<h1 align="center">🏛️ Book-Vault API</h1>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+<p align="center">
+  <strong>A Curated Archival Library, Catalog & Circulation Backend Engine</strong>
 </p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+<p align="center">
+  <img src="https://img.shields.io/badge/NestJS-v12.0-E0234E?style=flat&logo=nestjs&logoColor=white" alt="NestJS" />
+  <img src="https://img.shields.io/badge/SQLite-v3-003B57?style=flat&logo=sqlite&logoColor=white" alt="SQLite" />
+  <img src="https://img.shields.io/badge/TypeScript-v6-3178C6?style=flat&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Sentry-Monitoring-362D59?style=flat&logo=sentry&logoColor=white" alt="Sentry" />
+  <img src="https://img.shields.io/badge/Vitest-E2E%20Tested-6E9F18?style=flat&logo=vitest&logoColor=white" alt="Vitest" />
+  <img src="https://img.shields.io/badge/Auth-JWT%20%2B%20Bcrypt-000000?style=flat&logo=jsonwebtokens&logoColor=white" alt="Auth" />
+</p>
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## 📌 Project Focus & Disclaimer
 
-```bash
-$ npm install
+> 💡 **Backend-First Architectural Project**  
+> This application was constructed primarily to learn and master **NestJS server-side patterns** — enterprise modular architecture, custom dependency injection, route validation pipes, JWT authentication guards, role-based access control (RBAC), and SQLite relational data integrity.  
+>  
+> *Note on Frontend:* **AI was utilized to design and style the minimalist archival interface**, serving as a living testbed for the backend APIs without shifting focus away from backend engineering.
+
+---
+
+## 📑 Table of Contents
+
+- [🏛️ Overview](#️-overview)
+- [🧩 Architecture & Core Concepts](#-architecture--core-concepts)
+- [📡 API Route Manifest (All 18 Routes)](#-api-route-manifest-all-18-routes)
+- [🛡️ Security & Role Matrix](#️-security--role-matrix)
+- [📈 Observability & Sentry](#-observability--sentry)
+- [💾 Database Relational Schema](#-database-relational-schema)
+- [🚀 Quick Start & Installation](#-quick-start--installation)
+- [🧪 Test Suite Execution](#-test-suite-execution)
+- [📦 Built-in Demo Personas](#-built-in-demo-personas)
+
+---
+
+## 🏛️ Overview
+
+**Book-Vault** is an archival catalog and private circulation management platform. It models a scholarly preservation library where:
+
+1. **Curators (`ADMIN`)** accession rare volumes, categorize texts, audit registered scholars, update user access permissions, and de-accession volumes.
+2. **Scholars (`USER`)** browse categorized volumes, search by title or author, request physical loans, return volumes to restore shelf availability, submit star-rated critiques, and monitor their personal reading metrics.
+
+---
+
+## 🧩 Architecture & Core Concepts
+
+Built according to clean NestJS software engineering principles:
+
+- **Modular Architecture**: Isolated domain modules (`AuthModule`, `BookModule`, `BorrowModule`, `ReviewModule`, `UserModule`, `DatabaseModule`).
+- **Global Database Service**: SQLite connection pool with explicit `PRAGMA foreign_keys = ON;`, `PRAGMA journal_mode = WAL;`, and automatic schema synchronization.
+- **DTO Validation Pipeline**: Strict request payloads validated via `class-validator` and `ValidationPipe` (`whitelist: true, forbidNonWhitelisted: true, transform: true`).
+- **Guards & Custom Decorators**:
+  - `AuthGuard`: Verifies Bearer JWT signature and extracts user metadata.
+  - `RolesGuard`: Enforces role-based endpoint authorization (`ADMIN` vs `USER`).
+  - `@CurrentUser()`: Extracts the authenticated user entity from request context.
+- **Global Error Handling**: `AllExceptionFilter` standardizes response shapes and intercepts uncaught 500 exceptions directly to **Sentry**.
+
+---
+
+## 📡 API Route Manifest (All 18 Routes)
+
+| # | HTTP Method | Endpoint | Access Level | Description |
+|---|---|---|---|---|
+| **1** | `POST` | `/auth/register` | Public | Register new fellow or curator |
+| **2** | `POST` | `/auth/login` | Public | Authenticate credentials & issue JWT |
+| **3** | `GET` | `/auth/me` | Protected (`USER`/`ADMIN`) | Retrieve authenticated scholar profile |
+| **4** | `GET` | `/books` | Public | List all books with category, author & search filters |
+| **5** | `GET` | `/books/:id` | Public | Retrieve accession details for specific volume |
+| **6** | `POST` | `/books` | Curator (`ADMIN`) | Deposit new volume into the archival stacks |
+| **7** | `PATCH` | `/books/:id` | Curator (`ADMIN`) | Modify volume metadata or description |
+| **8** | `DELETE` | `/books/:id` | Curator (`ADMIN`) | De-accession / remove volume from archive |
+| **9** | `POST` | `/borrows` | Protected (`USER`/`ADMIN`) | Request a book loan (marks book unavailable) |
+| **10** | `PATCH` | `/borrows/:id/return` | Protected (Borrower) | Return loaned volume (restores shelf availability) |
+| **11** | `GET` | `/borrows/my` | Protected (`USER`/`ADMIN`) | View authenticated user's active & past loans |
+| **12** | `POST` | `/reviews` | Protected (`USER`/`ADMIN`) | Post curatorial review with 1–5 star rating |
+| **13** | `GET` | `/reviews/book/:bookId` | Public | Fetch critiques & average rating for a book |
+| **14** | `GET` | `/users` | Curator (`ADMIN`) | Audit full fellowship user directory & loan counts |
+| **15** | `PATCH` | `/users/:id/role` | Curator (`ADMIN`) | Elevate or downgrade a user's role |
+| **16** | `GET` | `/users/me/dashboard` | Protected (`USER`/`ADMIN`) | Scholar stats (borrows, active, avg rating) |
+| **17** | `GET` | `/api/health` | Public | System uptime & Sentry telemetry status |
+| **18** | `GET` | `/` | Browser / Test | Delivers UI for browsers; plain text for test fixtures |
+
+---
+
+## 🛡️ Security & Role Matrix
+
+```
+┌────────────────────┬───────────┬─────────────┬──────────────┐
+│ Endpoint Scope     │ Anonymous │ Role: USER  │ Role: ADMIN  │
+├────────────────────┼───────────┼─────────────┼──────────────┤
+│ Catalog Browsing   │     ✅    │      ✅     │      ✅      │
+│ Book Reviews Read  │     ✅    │      ✅     │      ✅      │
+│ Borrowing Books    │     ❌    │      ✅     │      ✅      │
+│ Returning Books    │     ❌    │  ✅ (Own)   │  ✅ (Own)    │
+│ Writing Reviews    │     ❌    │      ✅     │      ✅      │
+│ Personal Dashboard │     ❌    │      ✅     │      ✅      │
+│ Accessioning Books │     ❌    │      ❌     │      ✅      │
+│ Deleting Books     │     ❌    │      ❌     │      ✅      │
+│ Modifying Roles    │     ❌    │      ❌     │      ✅      │
+│ User Auditing      │     ❌    │      ❌     │      ✅      │
+└────────────────────┴───────────┴─────────────┴──────────────┘
 ```
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ npm run start
+## 📈 Observability & Sentry
 
-# watch mode
-$ npm run start:dev
+Error tracking and performance monitoring are integrated into the application entry point via `@sentry/nestjs`:
 
-# production mode
-$ npm run start:prod
+- **Instrumentation Bootstrap**: `src/instrument.ts` initializes Sentry before any other Nest application modules load.
+- **Central Exception Filter**: `src/common/filters/allExceptions.filter.ts` catches unhandled runtime exceptions and forwards traces to Sentry with complete stack diagnostics.
+- **Trace Context**: Preserves execution context across controllers, guards, and SQLite queries.
+
+---
+
+## 💾 Database Relational Schema
+
+```sql
+-- SQLite Relational Architecture with Foreign Keys Enabled
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    role TEXT CHECK(role IN ('USER', 'ADMIN')) DEFAULT 'USER',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE books (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    author TEXT NOT NULL,
+    category TEXT CHECK(category IN ('FICTION', 'NON_FICTION', 'SCI_FI', 'BIOGRAPHY', 'MYSTERY', 'FANTASY')) NOT NULL,
+    description TEXT,
+    isbn TEXT UNIQUE NOT NULL,
+    is_available BOOLEAN DEFAULT 1,
+    added_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE borrows (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    book_id INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+    borrowed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    returned_at DATETIME,
+    status TEXT CHECK(status IN ('BORROWED', 'RETURNED')) DEFAULT 'BORROWED'
+);
+
+CREATE TABLE reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    book_id INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+    rating INTEGER CHECK(rating BETWEEN 1 AND 5) NOT NULL,
+    comment TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, book_id)
+);
 ```
 
-## Run tests
+---
 
+## 🚀 Quick Start & Installation
+
+### 1. Prerequisites
+- **Node.js**: `v20+` or `v22+`
+- **npm**: `v10+`
+
+### 2. Clone & Install Dependencies
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+git clone <repository-url>
+cd bookvault-api
+npm install
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+### 3. Environment Configuration
+Create a `.env` file in the root directory (or use default development fallbacks):
+```env
+PORT=3000
+JWT_SECRET=your_super_secret_jwt_key
+SENTRY_DSN=your_sentry_dsn_optional
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 4. Run Development Server
+```bash
+# Starts the NestJS dev server with file watching
+npm run dev
+```
+Visit `http://localhost:3000` in your browser to experience the archival interface or test the API.
 
-## Observability
+---
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+## 🧪 Test Suite Execution
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project:
+The project features 100% route coverage spanning controllers, services, guards, and SQLite state changes.
 
 ```bash
-$ npm install @nestjs/observe
+# Run unit tests
+npm test
+
+# Run full end-to-end (E2E) integration test suite
+npm run test:e2e
+
+# Run linter (oxlint with zero warnings / errors)
+npm run lint
+
+# Build production bundle
+npm run build
 ```
 
-Then follow the [setup guide](https://docs.nestjs.com/observability/overview) - it takes a single import and an app key.
+---
 
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
+## 📦 Built-in Demo Personas
 
-## Resources
+When running the application, demo accounts are pre-seeded into the SQLite database for rapid testing:
 
-Check out a few resources that may come in handy when working with NestJS:
+| Persona | Role | Email | Password |
+|---|---|---|---|
+| **Curator Eleanor Vance** | `ADMIN` | `curator@bookvault.org` | `vault123` |
+| **Fellow Julian Blackwood** | `USER` | `reader@bookvault.org` | `vault123` |
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+---
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+<p align="center">
+  <sub>Crafted with passion for clean backend engineering and scholarly curation.</sub>
+</p>
