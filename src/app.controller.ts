@@ -30,4 +30,15 @@ export class AppController {
       timestamp: new Date().toISOString(),
     };
   }
+
+  @Get('api')
+  getApi() {
+    return {
+      status: 'ok',
+      service: 'BookVault API',
+      version: '1.0.0',
+      message: 'BookVault Archival REST Core is running',
+      timestamp: new Date().toISOString(),
+    };
+  }
 }

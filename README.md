@@ -221,6 +221,39 @@ npm run build
 
 ---
 
+## ⚡ Deployment to Vercel
+
+Book-Vault is pre-configured for frictionless serverless deployment on Vercel:
+
+- **Serverless Entrypoint**: `api/index.ts` automatically wraps the NestJS engine into a Vercel Serverless Function.
+- **Vercel Routing**: `vercel.json` routes all REST API requests seamlessly while serving the static minimalist archival UI from `public/`.
+- **Serverless SQLite Compatibility**: `DatabaseService` dynamically detects the Vercel runtime and mounts the SQLite datastore into the writable `/tmp` volume with automatic schema initialization and pre-seeding.
+
+### Deploy Steps:
+
+#### Option A: One-Click Vercel CLI
+```bash
+# 1. Install Vercel CLI globally (if not installed)
+npm i -g vercel
+
+# 2. Deploy from the project root
+vercel
+
+# 3. Deploy to production
+vercel --prod
+```
+
+#### Option B: GitHub / Git Integration
+1. Push your repository to **GitHub** (or GitLab/Bitbucket).
+2. Go to [vercel.com](https://vercel.com) and click **"Add New Project"**.
+3. Import your `bookvault-api` repository.
+4. **Environment Variables**:
+   - `JWT_SECRET`: (e.g. `your_production_secret_key_here`)
+   - `SENTRY_DSN`: (optional)
+5. Click **Deploy**. Vercel will automatically build the NestJS backend and publish your live application.
+
+---
+
 ## 📦 Built-in Demo Personas
 
 When running the application, demo accounts are pre-seeded into the SQLite database for rapid testing:

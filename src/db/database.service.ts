@@ -13,21 +13,88 @@ export class DatabaseService implements OnModuleInit {
     private db: sqlite3.Database;
 
     onModuleInit() {
-        const dbPath = path.resolve(process.cwd(), 'bookvault.db');
+        const isVercel = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+        const dbDir = isVercel ? '/tmp' : process.cwd();
+        const dbPath = path.resolve(dbDir, 'bookvault.db');
+
+        if (isVercel && !fs.existsSync(dbPath)) {
+            const seedDbPath = path.resolve(process.cwd(), 'bookvault.db');
+            if (fs.existsSync(seedDbPath)) {
+                try {
+                    fs.copyFileSync(seedDbPath, dbPath);
+                    console.log('✅ Copied seeded database to /tmp/bookvault.db');
+                } catch (copyErr: any) {
+                    console.warn('⚠️ Could not copy pre-seeded db:', copyErr?.message);
+                }
+            }
+        }
+
         this.db = new sqlite3.Database(dbPath, (err) => {
             if (err) {
                 console.error('❌ Database connection failed:', err.message);
                 return;
             }
-            console.log('✅ Connected to SQLite database');
+            console.log('✅ Connected to SQLite database at:', dbPath);
             this.db.run('PRAGMA foreign_keys = ON;');
             this.db.run('PRAGMA journal_mode = WAL;');
             this.db.run('PRAGMA busy_timeout = 5000;');
 
-            const schema = fs.readFileSync(
+            let schema = '';
+            const possibleSchemaPaths = [
                 path.join(__dirname, 'schema.sql'),
-                'utf-8',
-            );
+                path.join(process.cwd(), 'src', 'db', 'schema.sql'),
+                path.join(process.cwd(), 'dist', 'db', 'schema.sql'),
+                path.join(process.cwd(), 'schema.sql'),
+            ];
+
+            for (const p of possibleSchemaPaths) {
+                if (fs.existsSync(p)) {
+                    schema = fs.readFileSync(p, 'utf-8');
+                    break;
+                }
+            }
+
+            if (!schema) {
+                schema = `
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    email TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    role TEXT CHECK(role IN ('USER', 'ADMIN')) DEFAULT 'USER',
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                );
+                CREATE TABLE IF NOT EXISTS books (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT NOT NULL,
+                    author TEXT NOT NULL,
+                    category TEXT CHECK(category IN ('FICTION', 'NON_FICTION', 'SCI_FI', 'BIOGRAPHY', 'MYSTERY', 'FANTASY')) NOT NULL,
+                    description TEXT,
+                    isbn TEXT UNIQUE NOT NULL,
+                    is_available BOOLEAN DEFAULT 1,
+                    added_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                );
+                CREATE TABLE IF NOT EXISTS borrows (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                    book_id INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+                    borrowed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    returned_at DATETIME,
+                    status TEXT CHECK(status IN ('BORROWED', 'RETURNED')) DEFAULT 'BORROWED'
+                );
+                CREATE TABLE IF NOT EXISTS reviews (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                    book_id INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+                    rating INTEGER CHECK(rating BETWEEN 1 AND 5) NOT NULL,
+                    comment TEXT,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(user_id, book_id)
+                );
+                `;
+            }
+
             this.db.exec(schema, (execErr) => {
                 if (execErr) {
                     console.error('❌ Schema initialization failed:', execErr.message);
