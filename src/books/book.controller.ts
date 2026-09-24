@@ -47,7 +47,7 @@ export class BooksController{
 
     // PATCH /books/:id ( ADMIN only )
     @UseGuards(AuthGuard , new RolesGuard(Role.ADMIN))
-    @Post(':id')
+    @Patch(':id')
     update(@Param('id' , ParseIntPipe) id:number, @Body() dto: UpdateBookDto)
     {
         return this.bookService.update(id , dto)

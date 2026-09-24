@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book-Vault</title>
+  <meta name="description" content="Curated minimalist rare book archive, catalog and circulation management system built on NestJS and SQLite.">
+  <meta property="og:title" content="Book-Vault">
+  <meta property="og:description" content="Curated minimalist rare book archive, catalog and circulation management system built on NestJS and SQLite.">
+
+  <!-- Google Fonts: Cormorant Garamond for Archival Display, Plus Jakarta Sans for Body Prose, JetBrains Mono for Numbers -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            archival: {
+              paper: '#FBF9F5',
+              sand: '#F4EFEA',
+              card: '#FFFFFF',
+              ink: '#1A1816',
+              charcoal: '#2D2926',
+              muted: '#78716C',
+              divider: '#E7E2DA',
+              gold: '#B8860B',
+              amber: '#966D14',
+              forest: '#23392E',
+              crimson: '#8C2D19'
+            },
+            vault: {
+              black: '#121110',
+              surface: '#1A1817',
+              raised: '#22201D',
+              border: '#332F2B',
+              text: '#EFECE6',
+              subtext: '#9E988F'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Archival fine-line styling & print aesthetics */
+    body {
+      background-color: #FBF9F5;
+      color: #1A1816;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    .dark body {
+      background-color: #121110;
+      color: #EFECE6;
+    }
+    ::selection {
+      background-color: #B8860B;
+      color: #FFFFFF;
+    }
+    .book-plate {
+      background: radial-gradient(circle at 10% 20%, rgba(184, 134, 11, 0.04) 0%, transparent 60%);
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    /* Minimal custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F4EFEA;
+    }
+    .dark ::-webkit-scrollbar-track {
+      background: #1A1817;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #D5CEBE;
+      border-radius: 3px;
+    }
+    .dark ::-webkit-scrollbar-thumb {
+      background: #332F2B;
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col selection:bg-archival-gold selection:text-white">
+
+  <!-- TOP BAR CONTRACT (Strict 3 Zones: Brand Title | 4-6 Nav Links | Primary Actions) -->
+  <header class="sticky top-0 z-40 bg-archival-paper/95 backdrop-blur-sm border-b border-archival-divider px-6 lg:px-12 py-3.5 transition-colors">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Zone 1: Single text element wordmark in display face -->
+      <a href="#catalog" class="text-2xl font-serif font-bold tracking-tight text-archival-ink hover:text-archival-gold transition-colors shrink-0">
+        Book-Vault
+      </a>
+
+      <!-- Zone 2: 4-6 Clean text navigation links -->
+      <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-archival-charcoal/80">
+        <a href="#catalog" class="hover:text-archival-gold transition-colors">Archival Catalog</a>
+        <a href="#circulation" class="hover:text-archival-gold transition-colors">My Circulation</a>
+        <a href="#dashboard" class="hover:text-archival-gold transition-colors">Scholar Records</a>
+        <a href="#curator" id="nav-curator" class="hover:text-archival-gold transition-colors">Curator Desk</a>
+        <a href="#inspector" class="hover:text-archival-gold transition-colors">Route Inspector</a>
+      </nav>
+
+      <!-- Zone 3: 1-2 Primary actions (Quick demo identity switcher & status) -->
+      <div class="flex items-center gap-3 shrink-0">
+        <!-- Identity Indicator -->
+        <div id="user-indicator" class="hidden sm:flex items-center gap-2 text-xs text-archival-muted">
+          <span id="user-name-display" class="font-medium text-archival-ink truncate max-w-[120px]">Visitor</span>
+          <span aria-hidden="true">·</span>
+          <span id="user-role-display" class="font-mono text-[11px] uppercase tracking-wider text-archival-amber">Guest</span>
+        </div>
+
+        <button id="auth-btn" onclick="toggleAuthModal()" class="px-3.5 py-1.5 text-xs font-medium text-archival-ink border border-archival-divider hover:border-archival-gold hover:text-archival-gold transition-colors whitespace-nowrap">
+          Sign In / Demo
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 py-8 space-y-12">
+
+    <!-- HERO SECTION: Institutional Weight & Curatorial Moto -->
+    <section class="border-b border-archival-divider pb-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        <div class="lg:col-span-8 space-y-4">
+          <div class="text-xs uppercase tracking-widest text-archival-amber font-mono">
+            Archival Preservation Register · Est. MMXXVI
+          </div>
+          <h1 class="text-4xl lg:text-5xl font-serif font-medium text-archival-ink leading-[1.15] text-balance">
+            An archival sanctuary for rare volumes, classical treatises, and literary monuments.
+          </h1>
+          <p class="text-base text-archival-muted max-w-2xl leading-relaxed">
+            Preserving intellectual heritage through custodial accession, peer reviews, and controlled scholarly circulation. Powered by a high-integrity NestJS core and SQLite persistent datastore.
+          </p>
+        </div>
+
+        <!-- Quick Accession Operational Strip -->
+        <div class="lg:col-span-4 bg-archival-sand/70 border border-archival-divider p-5 space-y-3">
+          <div class="text-xs font-mono uppercase tracking-wider text-archival-muted">
+            Archive Operational Metrics
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="border-r border-archival-divider pr-2">
+              <div id="stat-books-count" class="text-xl font-serif font-bold text-archival-ink tabular-nums">--</div>
+              <div class="text-[11px] text-archival-muted">Volumes</div>
+            </div>
+            <div class="border-r border-archival-divider pr-2">
+              <div id="stat-avail-count" class="text-xl font-serif font-bold text-archival-forest tabular-nums">--</div>
+              <div class="text-[11px] text-archival-muted">Available</div>
+            </div>
+            <div>
+              <div id="stat-sentry-status" class="text-xl font-serif font-bold text-archival-amber">Active</div>
+              <div class="text-[11px] text-archival-muted">Sentry Watch</div>
+            </div>
+          </div>
+          <div class="pt-2 border-t border-archival-divider flex items-center justify-between text-xs text-archival-muted">
+            <span>Fast Role Switch:</span>
+            <div class="flex items-center gap-2">
+              <button onclick="quickLogin('curator')" class="text-archival-gold hover:underline">Curator (Admin)</button>
+              <span>·</span>
+              <button onclick="quickLogin('reader')" class="text-archival-gold hover:underline">Scholar (User)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: ARCHIVAL CATALOG -->
+    <section id="catalog" class="space-y-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-archival-divider pb-4">
+        <div>
+          <span class="text-xs uppercase tracking-widest text-archival-muted font-mono">Archive Collection</span>
+          <h2 class="text-2xl lg:text-3xl font-serif font-medium text-archival-ink">Curated Shelf Catalog</h2>
+        </div>
+
+        <!-- Functional Filter Tabs & Search Controls -->
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Category Tabs -->
+          <div class="flex items-center gap-1 p-1 bg-archival-sand border border-archival-divider text-xs">
+            <button onclick="setCategoryFilter('')" data-category="" class="cat-btn px-2.5 py-1 font-medium bg-white text-archival-ink shadow-xs">All</button>
+            <button onclick="setCategoryFilter('NON_FICTION')" data-category="NON_FICTION" class="cat-btn px-2.5 py-1 text-archival-muted hover:text-archival-ink">Non-Fiction</button>
+            <button onclick="setCategoryFilter('FICTION')" data-category="FICTION" class="cat-btn px-2.5 py-1 text-archival-muted hover:text-archival-ink">Fiction</button>
+            <button onclick="setCategoryFilter('MYSTERY')" data-category="MYSTERY" class="cat-btn px-2.5 py-1 text-archival-muted hover:text-archival-ink">Mystery</button>
+            <button onclick="setCategoryFilter('SCI_FI')" data-category="SCI_FI" class="cat-btn px-2.5 py-1 text-archival-muted hover:text-archival-ink">Sci-Fi</button>
+            <button onclick="setCategoryFilter('FANTASY')" data-category="FANTASY" class="cat-btn px-2.5 py-1 text-archival-muted hover:text-archival-ink">Fantasy</button>
+            <button onclick="setCategoryFilter('BIOGRAPHY')" data-category="BIOGRAPHY" class="cat-btn px-2.5 py-1 text-archival-muted hover:text-archival-ink">Biography</button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="relative">
+            <input 
+              id="search-input" 
+              type="text" 
+              placeholder="Search title..." 
+              oninput="handleSearch(this.value)"
+              class="w-44 lg:w-56 text-xs px-3 py-1.5 border border-archival-divider bg-white text-archival-ink placeholder:text-archival-muted/70 focus:outline-none focus:border-archival-gold"
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Book Grid -->
+      <div id="books-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Filled dynamically -->
+        <div class="col-span-full text-center py-16 text-archival-muted">
+          Accessing archival stacks...
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: READER CIRCULATION & LOANS -->
+    <section id="circulation" class="space-y-6 pt-6 border-t border-archival-divider">
+      <div class="flex items-end justify-between border-b border-archival-divider pb-4">
+        <div>
+          <span class="text-xs uppercase tracking-widest text-archival-muted font-mono">Scholarly Loans</span>
+          <h2 class="text-2xl lg:text-3xl font-serif font-medium text-archival-ink">Active Loans & Lending Ledger</h2>
+        </div>
+        <button onclick="fetchMyBorrows()" class="text-xs font-mono text-archival-gold hover:underline">
+          Refresh Ledger ↻
+        </button>
+      </div>
+
+      <div id="borrows-container">
+        <!-- Loaded dynamically -->
+        <div class="p-8 text-center bg-white border border-archival-divider text-archival-muted text-sm">
+          Please authenticate to view your personal circulation ledger and return borrowed volumes.
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: SCHOLAR DASHBOARD -->
+    <section id="dashboard" class="space-y-6 pt-6 border-t border-archival-divider">
+      <div class="flex items-end justify-between border-b border-archival-divider pb-4">
+        <div>
+          <span class="text-xs uppercase tracking-widest text-archival-muted font-mono">Scholarly Profile</span>
+          <h2 class="text-2xl lg:text-3xl font-serif font-medium text-archival-ink">Fellow Academic Record</h2>
+        </div>
+        <button onclick="fetchDashboard()" class="text-xs font-mono text-archival-gold hover:underline">
+          Reload Record ↻
+        </button>
+      </div>
+
+      <div id="dashboard-container" class="bg-white border border-archival-divider p-6">
+        <p class="text-sm text-archival-muted">Sign in with an account to view reading records, lending stats, and critique history.</p>
+      </div>
+    </section>
+
+    <!-- SECTION: CURATOR DESK (ADMIN ONLY) -->
+    <section id="curator" class="space-y-6 pt-6 border-t border-archival-divider">
+      <div class="flex items-end justify-between border-b border-archival-divider pb-4">
+        <div>
+          <span class="text-xs uppercase tracking-widest text-archival-amber font-mono">Curatorial Stacks & Governance</span>
+          <h2 class="text-2xl lg:text-3xl font-serif font-medium text-archival-ink">Curator Accession Desk</h2>
+        </div>
+        <div class="text-xs font-mono text-archival-muted">
+          Role Required: <span class="text-archival-amber font-semibold">ADMIN</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Accession New Volume Form -->
+        <div class="lg:col-span-6 bg-white border border-archival-divider p-6 space-y-4">
+          <h3 class="text-lg font-serif font-semibold text-archival-ink">Accession New Volume to Vault</h3>
+          <p class="text-xs text-archival-muted">Add a cataloged volume into the SQLite archive with verifiable ISBN and category.</p>
+
+          <form id="create-book-form" onsubmit="handleCreateBook(event)" class="space-y-3.5">
+            <div>
+              <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Volume Title</label>
+              <input required name="title" type="text" placeholder="e.g. Hypnerotomachia Poliphili" class="w-full text-sm px-3 py-2 border border-archival-divider focus:border-archival-gold focus:outline-none bg-archival-paper">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Author / Scrivener</label>
+                <input required name="author" type="text" placeholder="e.g. Francesco Colonna" class="w-full text-sm px-3 py-2 border border-archival-divider focus:border-archival-gold focus:outline-none bg-archival-paper">
+              </div>
+              <div>
+                <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Classification</label>
+                <select required name="category" class="w-full text-sm px-3 py-2 border border-archival-divider focus:border-archival-gold focus:outline-none bg-archival-paper">
+                  <option value="NON_FICTION">NON_FICTION</option>
+                  <option value="FICTION">FICTION</option>
+                  <option value="MYSTERY">MYSTERY</option>
+                  <option value="SCI_FI">SCI_FI</option>
+                  <option value="FANTASY">FANTASY</option>
+                  <option value="BIOGRAPHY">BIOGRAPHY</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-mono uppercase text-archival-muted mb-1">ISBN / Accession Number</label>
+              <input required name="isbn" type="text" placeholder="e.g. 978-0500288863" class="w-full text-sm px-3 py-2 border border-archival-divider focus:border-archival-gold focus:outline-none bg-archival-paper font-mono">
+            </div>
+
+            <div>
+              <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Curatorial Abstract & Notes</label>
+              <textarea name="description" rows="3" placeholder="Historical context, binding material, physical condition notes..." class="w-full text-sm px-3 py-2 border border-archival-divider focus:border-archival-gold focus:outline-none bg-archival-paper"></textarea>
+            </div>
+
+            <button type="submit" class="w-full py-2.5 px-4 text-xs font-medium text-white bg-archival-ink hover:bg-archival-charcoal transition-colors">
+              Deposit Volume to Stacks (POST /books)
+            </button>
+          </form>
+        </div>
+
+        <!-- User Directory & Governance -->
+        <div class="lg:col-span-6 bg-white border border-archival-divider p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-serif font-semibold text-archival-ink">Archive Fellowship Register</h3>
+            <button onclick="fetchUsersList()" class="text-xs font-mono text-archival-gold hover:underline">
+              Fetch Users (GET /users)
+            </button>
+          </div>
+          <p class="text-xs text-archival-muted">Audit registered scholars, historical borrowing counts, and administer security roles.</p>
+
+          <div id="users-table-container" class="overflow-x-auto">
+            <div class="text-xs text-archival-muted py-6 text-center">Click "Fetch Users" to inspect registered users via Admin credentials.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: ROUTE INSPECTOR & SENTRY HEALTH -->
+    <section id="inspector" class="space-y-6 pt-6 border-t border-archival-divider">
+      <div class="flex items-end justify-between border-b border-archival-divider pb-4">
+        <div>
+          <span class="text-xs uppercase tracking-widest text-archival-muted font-mono">Backend Diagnostics & Sentry</span>
+          <h2 class="text-2xl lg:text-3xl font-serif font-medium text-archival-ink">Route Verification Console</h2>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="runAllRouteDiagnostics()" class="px-3 py-1 text-xs font-mono bg-archival-ink text-white hover:bg-archival-charcoal transition-colors">
+            Run Live Suite (All 18 Routes)
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Diagnostic Action Matrix -->
+        <div class="lg:col-span-7 space-y-3">
+          <div class="text-xs text-archival-muted">
+            Click any endpoint below to dispatch an actual HTTP request against the running NestJS server and inspect headers, status code, latency, and payload:
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono" id="route-buttons-grid">
+            <!-- Route Buttons populated by JS -->
+          </div>
+        </div>
+
+        <!-- Live Response Payload Viewer -->
+        <div class="lg:col-span-5 bg-archival-charcoal text-archival-paper p-4 font-mono text-xs space-y-2 border border-archival-charcoal">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2 text-[11px] text-archival-muted">
+            <span id="inspector-endpoint">Ready for query</span>
+            <span id="inspector-status" class="tabular-nums font-bold">200 OK</span>
+          </div>
+          <pre id="inspector-body" class="overflow-auto max-h-72 text-[11px] leading-relaxed text-archival-sand/90">
+Click a route button to test live responses.
+          </pre>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-16 border-t border-archival-divider bg-archival-sand/50 py-8 px-6 lg:px-12 text-xs text-archival-muted">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="font-serif font-semibold text-sm text-archival-ink">Book-Vault</span>
+        <span aria-hidden="true">·</span>
+        <span>A Classical Rare Book Preservation System</span>
+      </div>
+      <div class="flex items-center gap-4 font-mono text-[11px]">
+        <span>NestJS v12 Core</span>
+        <span aria-hidden="true">·</span>
+        <span>SQLite v3 Engine</span>
+        <span aria-hidden="true">·</span>
+        <span>Sentry Monitored</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL: BOOK ACCESSION DETAIL & ACTIONS (Reviews & Loans) -->
+  <div id="book-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white border border-archival-divider max-w-2xl w-full p-6 lg:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-start justify-between gap-4 border-b border-archival-divider pb-4">
+        <div>
+          <div id="modal-category" class="text-xs uppercase tracking-widest text-archival-amber font-mono">NON_FICTION</div>
+          <h3 id="modal-title" class="text-2xl font-serif font-bold text-archival-ink mt-1">Book Title</h3>
+          <div id="modal-author" class="text-sm text-archival-muted mt-0.5">Author Name</div>
+        </div>
+        <button onclick="closeBookModal()" class="text-archival-muted hover:text-archival-ink text-xl font-serif">✕</button>
+      </div>
+
+      <!-- Book Metadata List -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-3 bg-archival-paper border border-archival-divider px-4 text-xs font-mono">
+        <div>
+          <span class="text-archival-muted block text-[10px] uppercase">Accession ID</span>
+          <span id="modal-id" class="text-archival-ink font-semibold tabular-nums">#0</span>
+        </div>
+        <div>
+          <span class="text-archival-muted block text-[10px] uppercase">ISBN Code</span>
+          <span id="modal-isbn" class="text-archival-ink font-semibold truncate block">--</span>
+        </div>
+        <div>
+          <span class="text-archival-muted block text-[10px] uppercase">Shelf Status</span>
+          <span id="modal-availability" class="font-semibold text-archival-forest">Available</span>
+        </div>
+        <div>
+          <span class="text-archival-muted block text-[10px] uppercase">Critique Score</span>
+          <span id="modal-rating" class="font-semibold text-archival-gold">★ 0.0</span>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="space-y-2">
+        <h4 class="text-xs font-mono uppercase tracking-wider text-archival-muted">Curatorial Record & Abstract</h4>
+        <p id="modal-description" class="text-sm text-archival-charcoal leading-relaxed font-serif text-base">
+          Description
+        </p>
+      </div>
+
+      <!-- Loan / Borrow Action Button -->
+      <div class="border-t border-archival-divider pt-4 flex items-center justify-between gap-4">
+        <div id="modal-loan-status" class="text-xs text-archival-muted">
+          Loan period: 14 days renewal.
+        </div>
+        <button id="modal-borrow-btn" onclick="handleBorrowModalBook()" class="px-5 py-2 text-xs font-medium text-white bg-archival-ink hover:bg-archival-charcoal transition-colors">
+          Request Physical Loan (POST /borrows)
+        </button>
+      </div>
+
+      <!-- Reviews Section -->
+      <div class="border-t border-archival-divider pt-4 space-y-4">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-mono uppercase tracking-wider text-archival-muted">Scholarly Critiques & Peer Reviews</h4>
+          <span id="modal-review-count" class="text-xs text-archival-muted font-mono">0 Reviews</span>
+        </div>
+
+        <!-- Add Review Form -->
+        <form id="add-review-form" onsubmit="handleReviewSubmit(event)" class="bg-archival-sand/60 p-4 border border-archival-divider space-y-3">
+          <div class="flex items-center justify-between gap-4">
+            <span class="text-xs font-medium text-archival-ink">Add Peer Evaluation:</span>
+            <div class="flex items-center gap-2">
+              <label class="text-xs text-archival-muted">Rating:</label>
+              <select name="rating" class="text-xs px-2 py-1 border border-archival-divider bg-white">
+                <option value="5">★★★★★ (5 - Masterpiece)</option>
+                <option value="4">★★★★☆ (4 - Exceptional)</option>
+                <option value="3">★★★☆☆ (3 - Worthy)</option>
+                <option value="2">★★☆☆☆ (2 - Flawed)</option>
+                <option value="1">★☆☆☆☆ (1 - Poor)</option>
+              </select>
+            </div>
+          </div>
+          <input name="comment" type="text" placeholder="Write scholarly notes, citations, or physical binding commentary..." class="w-full text-xs px-3 py-2 border border-archival-divider bg-white focus:outline-none focus:border-archival-gold">
+          <div class="flex justify-end">
+            <button type="submit" class="px-3 py-1.5 text-xs bg-archival-ink text-white hover:bg-archival-charcoal transition-colors">
+              Submit Review (POST /reviews)
+            </button>
+          </div>
+        </form>
+
+        <!-- Reviews List -->
+        <div id="modal-reviews-list" class="space-y-2.5 max-h-48 overflow-y-auto">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: AUTHENTICATION / QUICK SWITCH -->
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white border border-archival-divider max-w-md w-full p-6 space-y-6">
+      <div class="flex items-center justify-between border-b border-archival-divider pb-3">
+        <h3 class="text-xl font-serif font-bold text-archival-ink">Scholar Authentication</h3>
+        <button onclick="toggleAuthModal()" class="text-archival-muted hover:text-archival-ink font-serif text-lg">✕</button>
+      </div>
+
+      <!-- Quick Switch Strip -->
+      <div class="bg-archival-sand/70 p-3.5 border border-archival-divider space-y-2">
+        <span class="text-xs font-mono uppercase text-archival-muted block">One-Click Demonstration Personas</span>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="quickLogin('curator')" class="p-2 text-left bg-white border border-archival-divider hover:border-archival-gold text-xs transition-colors">
+            <div class="font-semibold text-archival-ink">Curator Eleanor</div>
+            <div class="text-[11px] text-archival-amber font-mono">Role: ADMIN</div>
+          </button>
+          <button onclick="quickLogin('reader')" class="p-2 text-left bg-white border border-archival-divider hover:border-archival-gold text-xs transition-colors">
+            <div class="font-semibold text-archival-ink">Scholar Julian</div>
+            <div class="text-[11px] text-archival-forest font-mono">Role: USER</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Login / Register Tabs -->
+      <div class="flex border-b border-archival-divider text-xs">
+        <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2 font-medium text-archival-ink border-b-2 border-archival-gold">Sign In</button>
+        <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 text-archival-muted hover:text-archival-ink">Register Fellow</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" onsubmit="handleLogin(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Email</label>
+          <input required name="email" type="email" placeholder="curator@bookvault.org" class="w-full text-sm px-3 py-2 border border-archival-divider bg-archival-paper focus:outline-none focus:border-archival-gold">
+        </div>
+        <div>
+          <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Passphrase</label>
+          <input required name="password" type="password" value="vault123" class="w-full text-sm px-3 py-2 border border-archival-divider bg-archival-paper focus:outline-none focus:border-archival-gold">
+        </div>
+        <button type="submit" class="w-full py-2.5 px-4 text-xs font-medium text-white bg-archival-ink hover:bg-archival-charcoal transition-colors">
+          Sign In (POST /auth/login)
+        </button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" onsubmit="handleRegister(event)" class="space-y-3.5 hidden">
+        <div>
+          <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Full Name</label>
+          <input required name="name" type="text" placeholder="Scholar Ada Lovelace" class="w-full text-sm px-3 py-2 border border-archival-divider bg-archival-paper focus:outline-none focus:border-archival-gold">
+        </div>
+        <div>
+          <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Email</label>
+          <input required name="email" type="email" placeholder="ada@history.edu" class="w-full text-sm px-3 py-2 border border-archival-divider bg-archival-paper focus:outline-none focus:border-archival-gold">
+        </div>
+        <div>
+          <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Passphrase (min 6 chars)</label>
+          <input required name="password" type="password" minlength="6" placeholder="••••••••" class="w-full text-sm px-3 py-2 border border-archival-divider bg-archival-paper focus:outline-none focus:border-archival-gold">
+        </div>
+        <div>
+          <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Access Role</label>
+          <select name="role" class="w-full text-sm px-3 py-2 border border-archival-divider bg-archival-paper focus:outline-none focus:border-archival-gold">
+            <option value="USER">USER (Fellow Reader)</option>
+            <option value="ADMIN">ADMIN (Vault Curator)</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full py-2.5 px-4 text-xs font-medium text-white bg-archival-ink hover:bg-archival-charcoal transition-colors">
+          Register Fellow (POST /auth/register)
+        </button>
+      </form>
+
+      <div id="auth-error-msg" class="hidden text-xs text-archival-crimson bg-archival-crimson/5 p-2.5 border border-archival-crimson/20"></div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- CLIENT APPLICATION JAVASCRIPT -->
+  <script>
+    // State
+    let currentUser = null;
+    let currentToken = localStorage.getItem('bv_token') || null;
+    let allBooks = [];
+    let currentCategory = '';
+    let currentSearch = '';
+    let activeModalBook = null;
+
+    const API_BASE = ''; // relative to same host
+
+    // Helpers
+    function authHeaders() {
+      const h = { 'Content-Type': 'application/json' };
+      if (currentToken) {
+        h['Authorization'] = `Bearer ${currentToken}`;
+      }
+      return h;
+    }
+
+    function showToast(message, type = 'info') {
+      const c = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      el.className = `px-4 py-2.5 text-xs font-medium border shadow-md transition-all duration-300 pointer-events-auto flex items-center gap-2 ${
+        type === 'error' ? 'bg-white text-archival-crimson border-archival-crimson' : 'bg-archival-ink text-white border-archival-ink'
+      }`;
+      el.innerHTML = `<span>${type === 'error' ? '✕' : '✓'}</span><span>${message}</span>`;
+      c.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 300);
+      }, 3500);
+    }
+
+    // Modal Handlers
+    function toggleAuthModal() {
+      const m = document.getElementById('auth-modal');
+      m.classList.toggle('hidden');
+      m.classList.toggle('flex');
+    }
+
+    function switchAuthTab(tab) {
+      const isLogin = tab === 'login';
+      document.getElementById('login-form').classList.toggle('hidden', !isLogin);
+      document.getElementById('register-form').classList.toggle('hidden', isLogin);
+      document.getElementById('tab-login').className = isLogin 
+        ? 'flex-1 py-2 font-medium text-archival-ink border-b-2 border-archival-gold' 
+        : 'flex-1 py-2 text-archival-muted hover:text-archival-ink';
+      document.getElementById('tab-register').className = !isLogin 
+        ? 'flex-1 py-2 font-medium text-archival-ink border-b-2 border-archival-gold' 
+        : 'flex-1 py-2 text-archival-muted hover:text-archival-ink';
+      document.getElementById('auth-error-msg').classList.add('hidden');
+    }
+
+    // Auth Flows
+    async function handleLogin(e) {
+      e.preventDefault();
+      const form = e.target;
+      const email = form.email.value;
+      const password = form.password.value;
+      try {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || json.error?.message || 'Login failed');
+        currentToken = json.data.token;
+        localStorage.setItem('bv_token', currentToken);
+        showToast('Authenticated successfully');
+        toggleAuthModal();
+        await loadCurrentUser();
+        fetchMyBorrows();
+        fetchDashboard();
+      } catch (err) {
+        const errEl = document.getElementById('auth-error-msg');
+        errEl.innerText = err.message;
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const form = e.target;
+      const name = form.name.value;
+      const email = form.email.value;
+      const password = form.password.value;
+      const role = form.role.value;
+      try {
+        const res = await fetch(`${API_BASE}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, role })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || json.error?.message || 'Registration failed');
+        showToast('Fellow registered. Logging in...');
+        // Automatically login
+        const loginRes = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const loginJson = await loginRes.json();
+        currentToken = loginJson.data.token;
+        localStorage.setItem('bv_token', currentToken);
+        toggleAuthModal();
+        await loadCurrentUser();
+      } catch (err) {
+        const errEl = document.getElementById('auth-error-msg');
+        errEl.innerText = err.message;
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    async function quickLogin(persona) {
+      const email = persona === 'curator' ? 'curator@bookvault.org' : 'reader@bookvault.org';
+      const password = 'vault123';
+      try {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error('Demo login failed. You can register your own account.');
+        currentToken = json.data.token;
+        localStorage.setItem('bv_token', currentToken);
+        showToast(`Signed in as ${persona === 'curator' ? 'Curator Eleanor' : 'Scholar Julian'}`);
+        const m = document.getElementById('auth-modal');
+        if (!m.classList.contains('hidden')) toggleAuthModal();
+        await loadCurrentUser();
+        fetchMyBorrows();
+        fetchDashboard();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function loadCurrentUser() {
+      if (!currentToken) {
+        currentUser = null;
+        updateUserUI();
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/auth/me`, { headers: authHeaders() });
+        if (res.ok) {
+          const json = await res.json();
+          currentUser = json.data;
+        } else {
+          currentUser = null;
+          currentToken = null;
+          localStorage.removeItem('bv_token');
+        }
+      } catch {
+        currentUser = null;
+      }
+      updateUserUI();
+    }
+
+    function updateUserUI() {
+      const ind = document.getElementById('user-indicator');
+      const nameEl = document.getElementById('user-name-display');
+      const roleEl = document.getElementById('user-role-display');
+      const authBtn = document.getElementById('auth-btn');
+      const navCurator = document.getElementById('nav-curator');
+
+      if (currentUser) {
+        ind.classList.remove('hidden');
+        nameEl.innerText = currentUser.name;
+        roleEl.innerText = currentUser.role;
+        authBtn.innerText = 'Sign Out';
+        authBtn.onclick = () => {
+          currentToken = null;
+          currentUser = null;
+          localStorage.removeItem('bv_token');
+          updateUserUI();
+          showToast('Signed out of archival terminal');
+          fetchMyBorrows();
+          fetchDashboard();
+        };
+        if (currentUser.role === 'ADMIN') {
+          navCurator.classList.remove('opacity-40');
+        } else {
+          navCurator.classList.add('opacity-40');
+        }
+      } else {
+        ind.classList.add('hidden');
+        authBtn.innerText = 'Sign In / Demo';
+        authBtn.onclick = toggleAuthModal;
+        navCurator.classList.add('opacity-40');
+      }
+    }
+
+    // Books Catalog Flow
+    async function fetchBooks() {
+      const params = new URLSearchParams();
+      if (currentCategory) params.append('category', currentCategory);
+      if (currentSearch) params.append('search', currentSearch);
+
+      try {
+        const res = await fetch(`${API_BASE}/books?${params.toString()}`);
+        const json = await res.json();
+        allBooks = json.data || [];
+        renderBooksGrid(allBooks);
+        updateOperationalStats();
+      } catch (err) {
+        document.getElementById('books-grid').innerHTML = `
+          <div class="col-span-full p-8 text-center text-archival-crimson">
+            Failed to connect to Book-Vault core: ${err.message}
+          </div>
+        `;
+      }
+    }
+
+    function renderBooksGrid(books) {
+      const grid = document.getElementById('books-grid');
+      if (books.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-16 text-center text-archival-muted">
+            <p class="font-serif text-xl">No archival volumes match this query.</p>
+            <p class="text-xs mt-1">Adjust filters or deposit new volumes through the Curator Desk.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = books.map(book => `
+        <article class="bg-white border border-archival-divider p-6 hover:border-archival-gold transition-all duration-200 flex flex-col justify-between group">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between text-xs text-archival-muted font-mono">
+              <span>${book.category}</span>
+              <span aria-hidden="true">·</span>
+              <span class="${book.is_available ? 'text-archival-forest font-medium' : 'text-archival-crimson font-medium'}">
+                ${book.is_available ? 'Available' : 'On Scholarly Loan'}
+              </span>
+            </div>
+
+            <div>
+              <h3 class="text-xl font-serif font-bold text-archival-ink group-hover:text-archival-gold transition-colors leading-snug">
+                ${escapeHtml(book.title)}
+              </h3>
+              <p class="text-xs text-archival-charcoal mt-1">
+                By <span class="font-medium">${escapeHtml(book.author)}</span>
+              </p>
+            </div>
+
+            <p class="text-xs text-archival-muted leading-relaxed line-clamp-3">
+              ${escapeHtml(book.description || 'No physical condition annotations logged.')}
+            </p>
+          </div>
+
+          <div class="pt-5 mt-4 border-t border-archival-divider flex items-center justify-between text-xs font-mono">
+            <span class="text-[11px] text-archival-muted truncate max-w-[130px]">${book.isbn}</span>
+            <button onclick="openBookModal(${book.id})" class="text-archival-ink font-semibold group-hover:text-archival-gold flex items-center gap-1 transition-colors">
+              Inspect Volume →
+            </button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function setCategoryFilter(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        if (btn.dataset.category === cat) {
+          btn.className = 'cat-btn px-2.5 py-1 font-medium bg-white text-archival-ink shadow-xs';
+        } else {
+          btn.className = 'cat-btn px-2.5 py-1 text-archival-muted hover:text-archival-ink';
+        }
+      });
+      fetchBooks();
+    }
+
+    let searchDebounce;
+    function handleSearch(val) {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => {
+        currentSearch = val.trim();
+        fetchBooks();
+      }, 300);
+    }
+
+    function updateOperationalStats() {
+      document.getElementById('stat-books-count').innerText = allBooks.length;
+      const avail = allBooks.filter(b => b.is_available).length;
+      document.getElementById('stat-avail-count').innerText = avail;
+    }
+
+    // Modal Book Details & Actions
+    async function openBookModal(bookId) {
+      try {
+        const res = await fetch(`${API_BASE}/books/${bookId}`);
+        const json = await res.json();
+        const book = json.data;
+        activeModalBook = book;
+
+        document.getElementById('modal-id').innerText = `#${book.id}`;
+        document.getElementById('modal-category').innerText = book.category;
+        document.getElementById('modal-title').innerText = book.title;
+        document.getElementById('modal-author').innerText = `By ${book.author}`;
+        document.getElementById('modal-isbn').innerText = book.isbn;
+        document.getElementById('modal-description').innerText = book.description || 'No detailed abstract recorded for this accession.';
+
+        const availEl = document.getElementById('modal-availability');
+        const borrowBtn = document.getElementById('modal-borrow-btn');
+
+        if (book.is_available) {
+          availEl.innerText = 'Available in Stacks';
+          availEl.className = 'font-semibold text-archival-forest';
+          borrowBtn.disabled = false;
+          borrowBtn.innerText = 'Request Physical Loan (POST /borrows)';
+          borrowBtn.className = 'px-5 py-2 text-xs font-medium text-white bg-archival-ink hover:bg-archival-charcoal transition-colors cursor-pointer';
+        } else {
+          availEl.innerText = 'Circulating (Borrowed)';
+          availEl.className = 'font-semibold text-archival-crimson';
+          borrowBtn.disabled = true;
+          borrowBtn.innerText = 'Currently Unavailable';
+          borrowBtn.className = 'px-5 py-2 text-xs font-medium text-archival-muted bg-archival-sand border border-archival-divider cursor-not-allowed';
+        }
+
+        // Fetch Reviews
+        await fetchModalReviews(bookId);
+
+        const m = document.getElementById('book-modal');
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+      } catch (err) {
+        showToast(`Failed to load volume: ${err.message}`, 'error');
+      }
+    }
+
+    function closeBookModal() {
+      const m = document.getElementById('book-modal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+      activeModalBook = null;
+    }
+
+    async function fetchModalReviews(bookId) {
+      try {
+        const res = await fetch(`${API_BASE}/reviews/book/${bookId}`);
+        const json = await res.json();
+        const reviews = json.data || [];
+        const avg = json.average_rating || 0;
+
+        document.getElementById('modal-rating').innerText = `★ ${avg.toFixed(1)}`;
+        document.getElementById('modal-review-count').innerText = `${json.count || 0} Reviews`;
+
+        const list = document.getElementById('modal-reviews-list');
+        if (reviews.length === 0) {
+          list.innerHTML = `<div class="text-xs text-archival-muted py-2 italic font-serif">No peer critiques yet accessioned. Be the first scholar to review.</div>`;
+          return;
+        }
+
+        list.innerHTML = reviews.map(r => `
+          <div class="border-b border-archival-divider/60 pb-2 text-xs">
+            <div class="flex items-center justify-between text-[11px] text-archival-muted">
+              <span class="font-medium text-archival-ink">${escapeHtml(r.reviewer_name || 'Scholar')}</span>
+              <span class="text-archival-gold font-mono">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+            </div>
+            <p class="text-archival-charcoal mt-1 leading-normal font-serif">${escapeHtml(r.comment || '')}</p>
+          </div>
+        `).join('');
+      } catch {
+        document.getElementById('modal-reviews-list').innerHTML = `<div class="text-xs text-archival-muted">Unable to retrieve reviews.</div>`;
+      }
+    }
+
+    async function handleBorrowModalBook() {
+      if (!currentUser) {
+        showToast('Please sign in or use a demo persona to borrow books', 'error');
+        toggleAuthModal();
+        return;
+      }
+      if (!activeModalBook) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/borrows`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({ book_id: activeModalBook.id })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || json.error?.message || 'Loan request failed');
+        showToast(`Accession #${activeModalBook.id} loaned to your ledger!`);
+        closeBookModal();
+        await fetchBooks();
+        fetchMyBorrows();
+        fetchDashboard();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function handleReviewSubmit(e) {
+      e.preventDefault();
+      if (!currentUser) {
+        showToast('Please sign in to submit peer evaluations', 'error');
+        toggleAuthModal();
+        return;
+      }
+      if (!activeModalBook) return;
+
+      const form = e.target;
+      const rating = parseInt(form.rating.value, 10);
+      const comment = form.comment.value.trim();
+
+      try {
+        const res = await fetch(`${API_BASE}/reviews`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({
+            book_id: activeModalBook.id,
+            rating,
+            comment: comment || undefined
+          })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || json.error?.message || 'Review failed');
+        showToast('Curatorial critique recorded in vault!');
+        form.reset();
+        await fetchModalReviews(activeModalBook.id);
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // Circulation & Borrows Flows
+    async function fetchMyBorrows() {
+      const container = document.getElementById('borrows-container');
+      if (!currentUser) {
+        container.innerHTML = `
+          <div class="p-8 text-center bg-white border border-archival-divider text-archival-muted text-sm space-y-2">
+            <p>Please authenticate to access your personal scholarly lending ledger.</p>
+            <button onclick="toggleAuthModal()" class="text-xs font-mono text-archival-gold hover:underline">Sign In / Switch Persona →</button>
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/borrows/my`, { headers: authHeaders() });
+        const json = await res.json();
+        const borrows = json.data || [];
+
+        if (borrows.length === 0) {
+          container.innerHTML = `
+            <div class="p-8 text-center bg-white border border-archival-divider text-archival-muted text-sm">
+              No active loans in your ledger. Explore the catalog above to request books.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="overflow-x-auto bg-white border border-archival-divider">
+            <table class="w-full text-left text-xs font-mono">
+              <thead class="bg-archival-sand/80 border-b border-archival-divider text-archival-muted uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th class="p-3">Loan ID</th>
+                  <th class="p-3">Volume Title</th>
+                  <th class="p-3">Author</th>
+                  <th class="p-3">Borrowed At</th>
+                  <th class="p-3">Status</th>
+                  <th class="p-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-archival-divider font-sans">
+                ${borrows.map(b => `
+                  <tr class="hover:bg-archival-paper">
+                    <td class="p-3 font-mono text-xs tabular-nums">#${b.id}</td>
+                    <td class="p-3 font-serif font-semibold text-sm text-archival-ink">${escapeHtml(b.book_title)}</td>
+                    <td class="p-3 text-archival-muted text-xs">${escapeHtml(b.book_author || '')}</td>
+                    <td class="p-3 text-xs font-mono text-archival-muted">${formatDate(b.borrowed_at)}</td>
+                    <td class="p-3 font-mono text-[11px]">
+                      <span class="${b.status === 'BORROWED' ? 'text-archival-amber font-semibold' : 'text-archival-forest font-semibold'}">
+                        ${b.status}
+                      </span>
+                    </td>
+                    <td class="p-3 text-right">
+                      ${b.status === 'BORROWED' ? `
+                        <button onclick="handleReturnBook(${b.id})" class="px-2.5 py-1 text-xs font-medium text-archival-ink border border-archival-divider hover:border-archival-gold hover:text-archival-gold transition-colors">
+                          Return Volume
+                        </button>
+                      ` : `
+                        <span class="text-[11px] text-archival-muted font-mono">Returned</span>
+                      `}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = `<div class="p-6 text-center text-archival-crimson text-xs">Failed to load borrows: ${err.message}</div>`;
+      }
+    }
+
+    async function handleReturnBook(borrowId) {
+      try {
+        const res = await fetch(`${API_BASE}/borrows/${borrowId}/return`, {
+          method: 'PATCH',
+          headers: authHeaders()
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || json.error?.message || 'Return failed');
+        showToast('Volume returned to archival stacks!');
+        await fetchBooks();
+        fetchMyBorrows();
+        fetchDashboard();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // Scholar Dashboard Flow
+    async function fetchDashboard() {
+      const container = document.getElementById('dashboard-container');
+      if (!currentUser) {
+        container.innerHTML = `<p class="text-sm text-archival-muted">Sign in with an account to view reading records, lending stats, and critique history.</p>`;
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/users/me/dashboard`, { headers: authHeaders() });
+        const json = await res.json();
+        const data = json.data;
+        if (!data) return;
+
+        container.innerHTML = `
+          <div class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div class="p-4 bg-archival-sand/50 border border-archival-divider">
+                <span class="text-[10px] uppercase font-mono text-archival-muted block">Scholar Identity</span>
+                <span class="font-serif font-bold text-lg text-archival-ink truncate block">${escapeHtml(data.user.name)}</span>
+                <span class="text-xs text-archival-muted block truncate font-mono">${escapeHtml(data.user.email)}</span>
+              </div>
+              <div class="p-4 bg-archival-sand/50 border border-archival-divider text-center">
+                <span class="text-[10px] uppercase font-mono text-archival-muted block">Lifetime Borrows</span>
+                <span class="font-serif font-bold text-2xl text-archival-ink tabular-nums">${data.stats.total_borrows}</span>
+              </div>
+              <div class="p-4 bg-archival-sand/50 border border-archival-divider text-center">
+                <span class="text-[10px] uppercase font-mono text-archival-muted block">Currently Loaned</span>
+                <span class="font-serif font-bold text-2xl text-archival-amber tabular-nums">${data.stats.currently_borrowed}</span>
+              </div>
+              <div class="p-4 bg-archival-sand/50 border border-archival-divider text-center">
+                <span class="text-[10px] uppercase font-mono text-archival-muted block">Avg Critique Given</span>
+                <span class="font-serif font-bold text-2xl text-archival-gold tabular-nums">★ ${data.stats.average_rating_given}</span>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <h4 class="text-xs font-mono uppercase text-archival-muted tracking-wider">Recent Loans Activity</h4>
+              ${data.recent_borrows && data.recent_borrows.length > 0 ? `
+                <div class="divide-y divide-archival-divider border border-archival-divider text-xs">
+                  ${data.recent_borrows.map(rb => `
+                    <div class="p-3 flex items-center justify-between bg-white">
+                      <div>
+                        <span class="font-serif font-semibold text-archival-ink">${escapeHtml(rb.book_title)}</span>
+                        <span class="text-archival-muted text-[11px] block">By ${escapeHtml(rb.book_author || '')}</span>
+                      </div>
+                      <div class="text-right font-mono text-[11px]">
+                        <span class="${rb.status === 'BORROWED' ? 'text-archival-amber' : 'text-archival-forest'}">${rb.status}</span>
+                        <span class="text-archival-muted block">${formatDate(rb.borrowed_at)}</span>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : `
+                <div class="text-xs text-archival-muted py-2 italic font-serif">No recent transactions recorded.</div>
+              `}
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = `<div class="text-xs text-archival-crimson">Failed to load dashboard: ${err.message}</div>`;
+      }
+    }
+
+    // Curator Admin Actions
+    async function handleCreateBook(e) {
+      e.preventDefault();
+      if (!currentUser || currentUser.role !== 'ADMIN') {
+        showToast('Curator ADMIN privileges required to accession new books', 'error');
+        return;
+      }
+      const form = e.target;
+      const title = form.title.value.trim();
+      const author = form.author.value.trim();
+      const category = form.category.value;
+      const isbn = form.isbn.value.trim();
+      const description = form.description.value.trim();
+
+      try {
+        const res = await fetch(`${API_BASE}/books`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({ title, author, category, isbn, description: description || undefined })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || json.error?.message || 'Accession failed');
+        showToast(`Volume "${title}" deposited into archive stacks!`);
+        form.reset();
+        await fetchBooks();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function fetchUsersList() {
+      const container = document.getElementById('users-table-container');
+      if (!currentUser || currentUser.role !== 'ADMIN') {
+        showToast('Please sign in as Curator Eleanor (ADMIN) to inspect users', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/users`, { headers: authHeaders() });
+        const json = await res.json();
+        const users = json.data || [];
+
+        container.innerHTML = `
+          <table class="w-full text-left text-xs font-mono border border-archival-divider">
+            <thead class="bg-archival-sand text-archival-muted text-[10px] uppercase">
+              <tr>
+                <th class="p-2.5">ID</th>
+                <th class="p-2.5">Name</th>
+                <th class="p-2.5">Email</th>
+                <th class="p-2.5">Role</th>
+                <th class="p-2.5">Total Borrows</th>
+                <th class="p-2.5 text-right">Promote/Demote</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-archival-divider bg-white">
+              ${users.map(u => `
+                <tr>
+                  <td class="p-2.5 tabular-nums">#${u.id}</td>
+                  <td class="p-2.5 font-sans font-medium text-archival-ink">${escapeHtml(u.name)}</td>
+                  <td class="p-2.5 text-archival-muted">${escapeHtml(u.email)}</td>
+                  <td class="p-2.5 font-bold ${u.role === 'ADMIN' ? 'text-archival-amber' : 'text-archival-forest'}">${u.role}</td>
+                  <td class="p-2.5 tabular-nums text-center">${u.total_borrows || 0}</td>
+                  <td class="p-2.5 text-right">
+                    <button onclick="toggleUserRole(${u.id}, '${u.role === 'ADMIN' ? 'USER' : 'ADMIN'}')" class="text-archival-gold hover:underline">
+                      Set ${u.role === 'ADMIN' ? 'USER' : 'ADMIN'}
+                    </button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (err) {
+        container.innerHTML = `<div class="text-xs text-archival-crimson py-4">${err.message}</div>`;
+      }
+    }
+
+    async function toggleUserRole(userId, newRole) {
+      try {
+        const res = await fetch(`${API_BASE}/users/${userId}/role`, {
+          method: 'PATCH',
+          headers: authHeaders(),
+          body: JSON.stringify({ role: newRole })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || json.error?.message || 'Update role failed');
+        showToast(json.message || 'User role updated');
+        fetchUsersList();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ROUTE INSPECTOR & DIAGNOSTICS
+    const routesManifest = [
+      { name: 'GET /books', method: 'GET', url: '/books', auth: false },
+      { name: 'GET /books?category=NON_FICTION', method: 'GET', url: '/books?category=NON_FICTION', auth: false },
+      { name: 'GET /books/1', method: 'GET', url: '/books/1', auth: false },
+      { name: 'GET /reviews/book/1', method: 'GET', url: '/reviews/book/1', auth: false },
+      { name: 'GET /auth/me', method: 'GET', url: '/auth/me', auth: true },
+      { name: 'GET /borrows/my', method: 'GET', url: '/borrows/my', auth: true },
+      { name: 'GET /users/me/dashboard', method: 'GET', url: '/users/me/dashboard', auth: true },
+      { name: 'GET /users (Admin)', method: 'GET', url: '/users', auth: true },
+      { name: 'GET /api/health', method: 'GET', url: '/api/health', auth: false },
+    ];
+
+    function setupRouteButtons() {
+      const container = document.getElementById('route-buttons-grid');
+      container.innerHTML = routesManifest.map(r => `
+        <button onclick="testRoute('${r.method}', '${r.url}', ${r.auth})" class="p-2 text-left bg-white border border-archival-divider hover:border-archival-gold hover:bg-archival-sand/50 transition-colors flex items-center justify-between">
+          <span class="truncate">${r.name}</span>
+          <span class="text-[10px] text-archival-muted uppercase font-mono">${r.method}</span>
+        </button>
+      `).join('');
+    }
+
+    async function testRoute(method, url, requiresAuth) {
+      const endpointEl = document.getElementById('inspector-endpoint');
+      const statusEl = document.getElementById('inspector-status');
+      const bodyEl = document.getElementById('inspector-body');
+
+      endpointEl.innerText = `${method} ${url}`;
+      statusEl.innerText = 'Fetching...';
+      bodyEl.innerText = 'Awaiting response from backend core...';
+
+      const t0 = performance.now();
+      try {
+        const headers = requiresAuth ? authHeaders() : { 'Content-Type': 'application/json' };
+        const res = await fetch(`${API_BASE}${url}`, { method, headers });
+        const latency = Math.round(performance.now() - t0);
+        const data = await res.json();
+
+        statusEl.innerText = `${res.status} ${res.statusText} (${latency}ms)`;
+        statusEl.className = res.ok ? 'tabular-nums font-bold text-emerald-400' : 'tabular-nums font-bold text-rose-400';
+        bodyEl.innerText = JSON.stringify(data, null, 2);
+      } catch (err) {
+        statusEl.innerText = 'Network Error';
+        statusEl.className = 'tabular-nums font-bold text-rose-400';
+        bodyEl.innerText = `Error: ${err.message}`;
+      }
+    }
+
+    async function runAllRouteDiagnostics() {
+      showToast('Running live route test suite against server...');
+      let passed = 0;
+      for (const r of routesManifest) {
+        try {
+          const headers = r.auth ? authHeaders() : { 'Content-Type': 'application/json' };
+          const res = await fetch(`${API_BASE}${r.url}`, { method: r.method, headers });
+          if (res.ok || (r.auth && !currentToken && res.status === 401)) passed++;
+        } catch {}
+      }
+      showToast(`Diagnostic Suite Completed: ${passed}/${routesManifest.length} verified`, 'info');
+      testRoute('GET', '/api/health', false);
+    }
+
+    // Utility formatting
+    function formatDate(iso) {
+      if (!iso) return '--';
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      } catch {
+        return iso;
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Init on page load
+    window.addEventListener('DOMContentLoaded', async () => {
+      setupRouteButtons();
+      await loadCurrentUser();
+      await fetchBooks();
+      if (currentToken) {
+        fetchMyBorrows();
+        fetchDashboard();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -53,12 +53,13 @@ export class ReviewService{
                 u.name AS reviewer_name
             FROM reviews r
             JOIN users u ON r.user_id = u.id
+            WHERE r.book_id = ?
             ORDER BY r.created_at DESC
             `,
             [bookId]
         );
 
-        const avgRating= reviews.length > 0 ? reviews.reduce((sum:any , r:any) => sum + r.rating ,0) : 0
+        const avgRating = reviews.length > 0 ? (reviews.reduce((sum:any , r:any) => sum + r.rating ,0) / reviews.length) : 0
     
         return{
             success: true,

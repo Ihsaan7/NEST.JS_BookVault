@@ -27,7 +27,7 @@ export class BorrowsController{
     }
 
     // PATCH /borrows/:id/return
-    @Patch('id/return')
+    @Patch(':id/return')
     returnBook(@Param('id', ParseIntPipe) id:number, @CurrentUser() user:any)
     {
         return this.borrowService.returnBook(id , user.id)

@@ -35,7 +35,7 @@ export class UserService {
         if(!user){ throw new NotFoundException(`User with ${id} not found!`)}
 
         await this.db.run(
-            `UPDATE users SET role = ?`,
+            `UPDATE users SET role = ? WHERE id = ?`,
             [dto.role, id]
         )
 
@@ -71,7 +71,7 @@ export class UserService {
 
         // Count active Borrow ( currently borrowd )
         const activeResult = await this.db.get(
-            `SELECT COUNT(*) AS active FROM borrows WHERE id =? AND status = 'BORROWED'`,
+            `SELECT COUNT(*) AS active FROM borrows WHERE user_id = ? AND status = 'BORROWED'`,
             [userId]
         );
 
@@ -86,7 +86,7 @@ export class UserService {
                 b.id , b.status , b.borrowed_at , b.returned_at,
                 bk.title AS book_title , bk.author AS book_author
             FROM borrows b
-            JOIN books bk ON b.book.id = bk.id
+            JOIN books bk ON b.book_id = bk.id
             WHERE b.user_id = ?
             ORDER BY b.borrowed_at DESC
             LIMIT 5`,

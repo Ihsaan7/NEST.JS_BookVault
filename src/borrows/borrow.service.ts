@@ -38,7 +38,7 @@ export class BorrowSerive{
 
         const newBorrow = await this.db.get(
             `SELECT 
-                b.id , b.user , b.book_id , b.status , b.borrowed_at,
+                b.id , b.user_id , b.book_id , b.status , b.borrowed_at,
                 bk.title AS book_title , bk.author as book_author
             FROM borrows b
             JOIN books bk ON b.book_id = bk.id
@@ -71,6 +71,11 @@ export class BorrowSerive{
             `UPDATE borrows SET status = ? , returned_at = CURRENT_TIMESTAMP 
                 WHERE id = ?`,
             [BorrowStatus.RETURNED , borrowedId]
+        );
+
+        await this.db.run(
+            `UPDATE books SET is_available = 1 WHERE id = ?`,
+            [borrow.book_id]
         );
 
         return {

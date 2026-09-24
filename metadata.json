@@ -1,0 +1,8 @@
+{
+  "name": "Book-Vault",
+  "description": "Curated minimalist rare book archive, catalog and circulation management system built on NestJS and SQLite.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

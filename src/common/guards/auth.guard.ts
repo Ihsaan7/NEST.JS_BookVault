@@ -22,7 +22,7 @@ export class AuthGuard implements CanActivate{
             // Verify the JWT
             const decoded = jwt.verify(
                 token,
-                process.env.JWT_SECRET_KEY as string || 'fallback_secret_key_for_development', // Provide fallback secret
+                process.env.JWT_SECRET || process.env.JWT_SECRET_KEY || 'fallback_secret_key',
             ) as any;
 
             // Attach user info with request
@@ -33,7 +33,7 @@ export class AuthGuard implements CanActivate{
             }
 
             return true
-        } catch (error) {
+        } catch {
                 throw new UnauthorizedException('Invalid or expired token');
         }
     }

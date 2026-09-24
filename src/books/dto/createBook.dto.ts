@@ -1,9 +1,9 @@
-import { IsString, IsNotEmpty, IsEnum, IsOptional, IsEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
 import { BookCategory } from '../../common/enums/bookCategory.enum.js';
 
 export class CreateBookDto{
     @IsString()
-    @IsEmpty()
+    @IsNotEmpty()
     title:string;
 
     @IsString()

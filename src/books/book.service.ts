@@ -18,21 +18,21 @@ export class BookService{
         const params: any[] =[]
 
         if(filters.category){
-            sql += `AND category - ?`;
+            sql += ` AND category = ?`;
             params.push(filters.category)
         }
         if(filters.author)
             {
-                sql += `AND author LIKE ?`;
-                params.push(`%${filters.author}`)
+                sql += ` AND author LIKE ?`;
+                params.push(`%${filters.author}%`)
             }
         if(filters.search)
             {
-                sql += `AND title LIKE ?`;
-                params.push(`%${filters.search}`)
+                sql += ` AND title LIKE ?`;
+                params.push(`%${filters.search}%`)
             }
         
-        sql += `ORDER by created_at DESC`;
+        sql += ` ORDER BY created_at DESC`;
 
         const books = await this.db.all(sql , params)
 

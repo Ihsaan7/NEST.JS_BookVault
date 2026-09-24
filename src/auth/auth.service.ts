@@ -88,7 +88,7 @@ export class AuthService {
 
     async getProfile(userId: number) {
         const user = await this.db.get(
-            `SELECT id, name, role, created_at FROM users WHERE id = ?`,
+            `SELECT id, name, email, role, created_at FROM users WHERE id = ?`,
             [userId],
         );
         if (!user) {

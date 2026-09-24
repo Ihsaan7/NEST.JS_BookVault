@@ -5,9 +5,8 @@ import {
     HttpException,
     HttpStatus,
 } from '@nestjs/common';
-import { timeStamp } from 'console';
 import { Request, Response } from 'express';
-import path from 'path';
+import * as Sentry from '@sentry/nestjs';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter{
@@ -30,6 +29,9 @@ export class AllExceptionFilter implements ExceptionFilter{
             })
             return
         }
+
+        Sentry.captureException(exception);
+        console.error('Unhandled exception caught by AllExceptionFilter:', exception);
 
         response.status(HttpStatus.INTERNAL_SERVER_ERROR).json(
             {
