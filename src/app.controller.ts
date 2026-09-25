@@ -32,6 +32,16 @@ export class AppController {
     };
   }
 
+  @Get(['favicon.ico', 'favicon.svg'])
+  getFavicon(@Res() res: Response) {
+    const iconPath = path.join(process.cwd(), 'public', 'favicon.svg');
+    if (fs.existsSync(iconPath)) {
+      res.type('image/svg+xml');
+      return res.sendFile(iconPath);
+    }
+    return res.status(404).send('Icon not found');
+  }
+
   @Get('api')
   getApi() {
     return {
