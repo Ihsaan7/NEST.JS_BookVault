@@ -42,6 +42,10 @@
     }
   </script>
   <style>
+    /* Strict sharp borders (border-radius: 0) across all UI elements */
+    *, *::before, *::after {
+      border-radius: 0px !important;
+    }
     body {
       background-color: #F8F9FA;
       color: #10162F;
@@ -54,48 +58,47 @@
 </head>
 <body class="min-h-full flex flex-col bg-cc-bg text-cc-text">
 
-  <!-- CODECADEMY-STYLE TOP NAVIGATION BAR -->
+  <!-- SPACIOUS CODECADEMY-STYLE TOP NAVIGATION BAR -->
   <header class="bg-cc-navy text-white sticky top-0 z-40 shadow-sm border-b border-cc-slate">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10">
+      <div class="flex items-center justify-between h-20">
         
         <!-- Brand Wordmark -->
-        <div class="flex items-center gap-6">
-          <a href="#" onclick="switchTab('catalog')" class="flex items-center gap-2.5 text-lg font-bold tracking-tight text-white hover:text-cc-yellow transition-colors">
-            <span class="w-8 h-8 rounded-md bg-cc-yellow text-cc-navy flex items-center justify-center font-black text-sm">BV</span>
-            <span>BookVault</span>
+        <div class="flex items-center gap-10">
+          <a href="#" onclick="switchTab('catalog')" class="flex items-center gap-3 text-lg font-bold tracking-tight text-white hover:text-cc-yellow transition-colors shrink-0">
+            <span class="w-9 h-9 bg-cc-yellow text-cc-navy flex items-center justify-center font-black text-sm border border-cc-yellow">BV</span>
+            <span class="tracking-wide">BookVault</span>
           </a>
 
-          <!-- Main Nav Tabs -->
-          <nav class="hidden md:flex items-center gap-1 text-sm font-medium text-slate-300">
-            <button onclick="switchTab('catalog')" id="tab-btn-catalog" class="nav-tab px-3 py-1.5 rounded-md hover:text-white hover:bg-cc-slate text-white bg-cc-slate transition-colors">
+          <!-- Main Nav Tabs with ample breathing room -->
+          <nav class="hidden md:flex items-center gap-2 text-sm font-medium text-slate-300">
+            <button onclick="switchTab('catalog')" id="tab-btn-catalog" class="nav-tab px-4 py-2 border border-transparent hover:text-white hover:bg-cc-slate text-white bg-cc-slate transition-colors">
               Books
             </button>
-            <button onclick="switchTab('borrows')" id="tab-btn-borrows" class="nav-tab px-3 py-1.5 rounded-md hover:text-white hover:bg-cc-slate transition-colors">
+            <button onclick="switchTab('borrows')" id="tab-btn-borrows" class="nav-tab px-4 py-2 border border-transparent hover:text-white hover:bg-cc-slate transition-colors">
               My Borrowed Books
             </button>
-            <button onclick="switchTab('add-book')" id="tab-btn-add-book" class="nav-tab px-3 py-1.5 rounded-md hover:text-white hover:bg-cc-slate transition-colors">
+            <button onclick="switchTab('add-book')" id="tab-btn-add-book" class="nav-tab px-4 py-2 border border-transparent hover:text-white hover:bg-cc-slate transition-colors">
               Add Book (Admin)
             </button>
-            <button onclick="switchTab('users')" id="tab-btn-users" class="nav-tab px-3 py-1.5 rounded-md hover:text-white hover:bg-cc-slate transition-colors">
+            <button onclick="switchTab('users')" id="tab-btn-users" class="nav-tab px-4 py-2 border border-transparent hover:text-white hover:bg-cc-slate transition-colors">
               Users (Admin)
             </button>
-            <button onclick="switchTab('tester')" id="tab-btn-tester" class="nav-tab px-3 py-1.5 rounded-md hover:text-white hover:bg-cc-slate transition-colors flex items-center gap-1.5">
+            <button onclick="switchTab('tester')" id="tab-btn-tester" class="nav-tab px-4 py-2 border border-transparent hover:text-white hover:bg-cc-slate transition-colors flex items-center gap-2">
               <span>API Tester</span>
-              <span class="text-[10px] px-1.5 py-0.5 rounded bg-cc-yellow text-cc-navy font-bold">LIVE</span>
+              <span class="text-[10px] px-1.5 py-0.5 bg-cc-yellow text-cc-navy font-bold uppercase tracking-wider">LIVE</span>
             </button>
           </nav>
         </div>
 
-        <!-- Identity / Quick Switcher -->
-        <div class="flex items-center gap-3">
-          <div id="user-pill" class="hidden sm:flex items-center gap-2 text-xs bg-cc-slate px-3 py-1.5 rounded-full border border-slate-700">
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span id="user-name" class="font-medium text-white truncate max-w-[120px]">User</span>
-            <span id="user-role-badge" class="font-mono text-[10px] px-1.5 py-0.2 rounded bg-cc-yellow text-cc-navy font-bold uppercase">USER</span>
+        <!-- Identity / Auth Actions -->
+        <div class="flex items-center gap-4 shrink-0">
+          <div id="user-pill" class="hidden sm:flex items-center gap-3 text-xs bg-cc-slate px-4 py-2 border border-slate-700">
+            <span id="user-name" class="font-medium text-white truncate max-w-[140px]">User</span>
+            <span id="user-role-badge" class="font-mono text-[10px] px-2 py-0.5 bg-cc-yellow text-cc-navy font-bold uppercase">USER</span>
           </div>
 
-          <button id="auth-main-btn" onclick="toggleAuthModal()" class="text-xs font-bold px-3.5 py-1.5 rounded-md bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors">
+          <button id="auth-main-btn" onclick="toggleAuthModal()" class="text-xs font-bold px-5 py-2.5 bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors border border-cc-yellow">
             Sign In
           </button>
         </div>
@@ -104,78 +107,78 @@
     </div>
 
     <!-- Mobile Navigation Row -->
-    <div class="md:hidden flex overflow-x-auto px-4 py-2 border-t border-cc-slate gap-2 text-xs font-medium text-slate-300">
-      <button onclick="switchTab('catalog')" class="whitespace-nowrap px-2.5 py-1 rounded hover:bg-cc-slate">Books</button>
-      <button onclick="switchTab('borrows')" class="whitespace-nowrap px-2.5 py-1 rounded hover:bg-cc-slate">My Borrows</button>
-      <button onclick="switchTab('add-book')" class="whitespace-nowrap px-2.5 py-1 rounded hover:bg-cc-slate">Add Book</button>
-      <button onclick="switchTab('users')" class="whitespace-nowrap px-2.5 py-1 rounded hover:bg-cc-slate">Users</button>
-      <button onclick="switchTab('tester')" class="whitespace-nowrap px-2.5 py-1 rounded hover:bg-cc-slate text-cc-yellow">API Tester</button>
+    <div class="md:hidden flex overflow-x-auto px-6 py-2.5 border-t border-cc-slate gap-2 text-xs font-medium text-slate-300">
+      <button onclick="switchTab('catalog')" class="whitespace-nowrap px-3 py-1.5 hover:bg-cc-slate border border-transparent">Books</button>
+      <button onclick="switchTab('borrows')" class="whitespace-nowrap px-3 py-1.5 hover:bg-cc-slate border border-transparent">My Borrows</button>
+      <button onclick="switchTab('add-book')" class="whitespace-nowrap px-3 py-1.5 hover:bg-cc-slate border border-transparent">Add Book</button>
+      <button onclick="switchTab('users')" class="whitespace-nowrap px-3 py-1.5 hover:bg-cc-slate border border-transparent">Users</button>
+      <button onclick="switchTab('tester')" class="whitespace-nowrap px-3 py-1.5 hover:bg-cc-slate text-cc-yellow border border-transparent">API Tester</button>
     </div>
   </header>
 
-  <!-- QUICK DEMO LOGIN BAR -->
-  <div class="bg-white border-b border-cc-border py-2.5 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
-      <div class="flex items-center gap-2 text-slate-600">
-        <span class="font-semibold text-cc-navy">Demo Accounts:</span>
-        <button onclick="quickLogin('curator')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-cc-navy font-medium border border-slate-300 transition-colors">
-          🔑 Admin (Curator)
+  <!-- QUICK DEMO LOGIN BAR (CLEAN & SHARP) -->
+  <div class="bg-white border-b border-cc-border py-3 px-6 lg:px-10">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+      <div class="flex flex-wrap items-center gap-3 text-slate-600">
+        <span class="font-bold text-cc-navy uppercase tracking-wider text-[11px]">Demo Accounts:</span>
+        <button onclick="quickLogin('curator')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-cc-navy font-semibold border border-slate-300 transition-colors">
+          Admin (Curator)
         </button>
-        <button onclick="quickLogin('reader')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-cc-navy font-medium border border-slate-300 transition-colors">
-          📖 User (Reader)
+        <button onclick="quickLogin('reader')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-cc-navy font-semibold border border-slate-300 transition-colors">
+          User (Reader)
         </button>
       </div>
 
       <div class="flex items-center gap-4 text-slate-500 font-mono text-[11px]">
         <span>NestJS 12 + SQLite</span>
-        <span>•</span>
+        <span>|</span>
         <span id="stats-total-books">Books: --</span>
-        <span>•</span>
-        <span id="stats-avail-books" class="text-emerald-600 font-semibold">Available: --</span>
+        <span>|</span>
+        <span id="stats-avail-books" class="text-emerald-700 font-bold">Available: --</span>
       </div>
     </div>
   </div>
 
   <!-- MAIN APP CONTAINER -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-6 lg:px-10 py-8 space-y-8">
 
     <!-- TAB 1: BOOKS CATALOG -->
     <section id="tab-catalog" class="space-y-6">
       <!-- Title & Search Controls -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-lg border border-cc-border shadow-xs">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 border border-cc-border">
         <div>
           <h1 class="text-xl font-bold text-cc-navy">Library Books Catalog</h1>
-          <p class="text-xs text-slate-500 mt-0.5">Browse available books, filter by category, or borrow a book.</p>
+          <p class="text-xs text-slate-500 mt-1">Browse available books, filter by category, or borrow a book.</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
           <!-- Category Filter Chips -->
-          <div class="flex items-center gap-1 overflow-x-auto p-1 bg-slate-100 rounded-md border border-slate-200 text-xs">
-            <button onclick="filterCategory('')" data-cat="" class="cat-chip px-2.5 py-1 rounded font-semibold bg-white text-cc-navy shadow-xs">All</button>
-            <button onclick="filterCategory('NON_FICTION')" data-cat="NON_FICTION" class="cat-chip px-2.5 py-1 rounded text-slate-600 hover:text-cc-navy">Non-Fiction</button>
-            <button onclick="filterCategory('FICTION')" data-cat="FICTION" class="cat-chip px-2.5 py-1 rounded text-slate-600 hover:text-cc-navy">Fiction</button>
-            <button onclick="filterCategory('MYSTERY')" data-cat="MYSTERY" class="cat-chip px-2.5 py-1 rounded text-slate-600 hover:text-cc-navy">Mystery</button>
-            <button onclick="filterCategory('SCI_FI')" data-cat="SCI_FI" class="cat-chip px-2.5 py-1 rounded text-slate-600 hover:text-cc-navy">Sci-Fi</button>
-            <button onclick="filterCategory('FANTASY')" data-cat="FANTASY" class="cat-chip px-2.5 py-1 rounded text-slate-600 hover:text-cc-navy">Fantasy</button>
-            <button onclick="filterCategory('BIOGRAPHY')" data-cat="BIOGRAPHY" class="cat-chip px-2.5 py-1 rounded text-slate-600 hover:text-cc-navy">Biography</button>
+          <div class="flex items-center gap-1 overflow-x-auto p-1 bg-slate-100 border border-slate-200 text-xs">
+            <button onclick="filterCategory('')" data-cat="" class="cat-chip px-3 py-1 font-semibold bg-white text-cc-navy border border-slate-300">All</button>
+            <button onclick="filterCategory('NON_FICTION')" data-cat="NON_FICTION" class="cat-chip px-3 py-1 text-slate-600 hover:text-cc-navy border border-transparent">Non-Fiction</button>
+            <button onclick="filterCategory('FICTION')" data-cat="FICTION" class="cat-chip px-3 py-1 text-slate-600 hover:text-cc-navy border border-transparent">Fiction</button>
+            <button onclick="filterCategory('MYSTERY')" data-cat="MYSTERY" class="cat-chip px-3 py-1 text-slate-600 hover:text-cc-navy border border-transparent">Mystery</button>
+            <button onclick="filterCategory('SCI_FI')" data-cat="SCI_FI" class="cat-chip px-3 py-1 text-slate-600 hover:text-cc-navy border border-transparent">Sci-Fi</button>
+            <button onclick="filterCategory('FANTASY')" data-cat="FANTASY" class="cat-chip px-3 py-1 text-slate-600 hover:text-cc-navy border border-transparent">Fantasy</button>
+            <button onclick="filterCategory('BIOGRAPHY')" data-cat="BIOGRAPHY" class="cat-chip px-3 py-1 text-slate-600 hover:text-cc-navy border border-transparent">Biography</button>
           </div>
 
           <!-- Search Input -->
-          <div class="relative w-full sm:w-56">
+          <div class="relative w-full sm:w-60">
             <input 
               id="search-input" 
               type="text" 
               placeholder="Search books..." 
               oninput="handleSearch(this.value)"
-              class="w-full text-xs px-3 py-2 rounded-md border border-slate-300 bg-white text-cc-navy placeholder:text-slate-400 focus:outline-none focus:border-cc-navy"
+              class="w-full text-xs px-3.5 py-2 border border-slate-300 bg-white text-cc-navy placeholder:text-slate-400 focus:outline-none focus:border-cc-navy"
             >
           </div>
         </div>
       </div>
 
       <!-- Book Grid -->
-      <div id="books-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        <div class="col-span-full text-center py-12 text-slate-400 text-sm">
+      <div id="books-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="col-span-full text-center py-16 text-slate-400 text-sm bg-white border border-cc-border">
           Loading library books...
         </div>
       </div>
@@ -183,13 +186,13 @@
 
     <!-- TAB 2: MY BORROWED BOOKS -->
     <section id="tab-borrows" class="space-y-6 hidden">
-      <div class="bg-white p-5 rounded-lg border border-cc-border shadow-xs flex items-center justify-between">
+      <div class="bg-white p-6 border border-cc-border flex items-center justify-between">
         <div>
           <h2 class="text-xl font-bold text-cc-navy">My Borrowed Books</h2>
-          <p class="text-xs text-slate-500 mt-0.5">Track your active and returned books. Click Return to give a book back.</p>
+          <p class="text-xs text-slate-500 mt-1">Track your active and returned books. Click Return to give a book back.</p>
         </div>
-        <button onclick="fetchMyBorrows()" class="text-xs font-semibold px-3 py-1.5 rounded-md border border-slate-300 hover:bg-slate-50 text-slate-700">
-          Refresh List ↻
+        <button onclick="fetchMyBorrows()" class="text-xs font-semibold px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 transition-colors">
+          Refresh List
         </button>
       </div>
 
@@ -200,7 +203,7 @@
 
     <!-- TAB 3: ADD BOOK (ADMIN) -->
     <section id="tab-add-book" class="space-y-6 hidden">
-      <div class="max-w-2xl mx-auto bg-white p-6 sm:p-8 rounded-lg border border-cc-border shadow-xs space-y-5">
+      <div class="max-w-2xl mx-auto bg-white p-8 border border-cc-border space-y-6">
         <div>
           <h2 class="text-xl font-bold text-cc-navy">Add a New Book</h2>
           <p class="text-xs text-slate-500 mt-1">Requires an Admin account (Curator). Fill in the book details below to add it to the catalog.</p>
@@ -209,17 +212,17 @@
         <form id="create-book-form" onsubmit="handleCreateBook(event)" class="space-y-4">
           <div>
             <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Book Title *</label>
-            <input required name="title" type="text" placeholder="e.g. Clean Code" class="w-full text-sm px-3.5 py-2 rounded-md border border-slate-300 focus:outline-none focus:border-cc-navy">
+            <input required name="title" type="text" placeholder="e.g. Clean Code" class="w-full text-sm px-3.5 py-2.5 border border-slate-300 focus:outline-none focus:border-cc-navy">
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Author *</label>
-              <input required name="author" type="text" placeholder="e.g. Robert C. Martin" class="w-full text-sm px-3.5 py-2 rounded-md border border-slate-300 focus:outline-none focus:border-cc-navy">
+              <input required name="author" type="text" placeholder="e.g. Robert C. Martin" class="w-full text-sm px-3.5 py-2.5 border border-slate-300 focus:outline-none focus:border-cc-navy">
             </div>
             <div>
               <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Category *</label>
-              <select name="category" class="w-full text-sm px-3.5 py-2 rounded-md border border-slate-300 focus:outline-none focus:border-cc-navy bg-white">
+              <select name="category" class="w-full text-sm px-3.5 py-2.5 border border-slate-300 focus:outline-none focus:border-cc-navy bg-white">
                 <option value="NON_FICTION">NON_FICTION</option>
                 <option value="FICTION">FICTION</option>
                 <option value="MYSTERY">MYSTERY</option>
@@ -232,15 +235,15 @@
 
           <div>
             <label class="block text-xs font-bold uppercase text-slate-700 mb-1">ISBN Number *</label>
-            <input required name="isbn" type="text" placeholder="e.g. 978-0132350884" class="w-full text-sm px-3.5 py-2 rounded-md border border-slate-300 focus:outline-none focus:border-cc-navy font-mono">
+            <input required name="isbn" type="text" placeholder="e.g. 978-0132350884" class="w-full text-sm px-3.5 py-2.5 border border-slate-300 focus:outline-none focus:border-cc-navy font-mono">
           </div>
 
           <div>
             <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Description</label>
-            <textarea name="description" rows="3" placeholder="Brief summary of the book..." class="w-full text-sm px-3.5 py-2 rounded-md border border-slate-300 focus:outline-none focus:border-cc-navy"></textarea>
+            <textarea name="description" rows="3" placeholder="Brief summary of the book..." class="w-full text-sm px-3.5 py-2.5 border border-slate-300 focus:outline-none focus:border-cc-navy"></textarea>
           </div>
 
-          <button type="submit" class="w-full py-2.5 px-4 text-xs font-bold rounded-md bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors shadow-xs">
+          <button type="submit" class="w-full py-3 px-4 text-xs font-bold bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors border border-cc-yellow">
             Save Book to Database (POST /books)
           </button>
         </form>
@@ -249,56 +252,54 @@
 
     <!-- TAB 4: USERS MANAGEMENT (ADMIN) -->
     <section id="tab-users" class="space-y-6 hidden">
-      <div class="bg-white p-5 rounded-lg border border-cc-border shadow-xs flex items-center justify-between">
+      <div class="bg-white p-6 border border-cc-border flex items-center justify-between">
         <div>
           <h2 class="text-xl font-bold text-cc-navy">User Management</h2>
-          <p class="text-xs text-slate-500 mt-0.5">Admin view to see all registered users and promote/demote roles.</p>
+          <p class="text-xs text-slate-500 mt-1">Admin view to see all registered users and promote/demote roles.</p>
         </div>
-        <button onclick="fetchUsersList()" class="text-xs font-semibold px-3 py-1.5 rounded-md bg-cc-navy text-white hover:bg-cc-slate">
+        <button onclick="fetchUsersList()" class="text-xs font-semibold px-4 py-2 bg-cc-navy text-white hover:bg-cc-slate transition-colors">
           Load Users (GET /users)
         </button>
       </div>
 
-      <div id="users-table-container" class="bg-white rounded-lg border border-cc-border p-4">
-        <p class="text-xs text-slate-400 text-center py-6">Click "Load Users" above or sign in as Admin to see user records.</p>
+      <div id="users-table-container" class="bg-white border border-cc-border p-5">
+        <p class="text-xs text-slate-400 text-center py-8">Click "Load Users" above or sign in as Admin to see user records.</p>
       </div>
     </section>
 
     <!-- TAB 5: API ROUTE TESTER (CODECADEMY THEME) -->
     <section id="tab-tester" class="space-y-6 hidden">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-lg border border-cc-border shadow-xs">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 border border-cc-border">
         <div>
-          <h2 class="text-xl font-bold text-cc-navy flex items-center gap-2">
+          <h2 class="text-xl font-bold text-cc-navy flex items-center gap-3">
             <span>API Route Tester & Inspector</span>
-            <span class="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono font-medium">Server: 3000 OK</span>
+            <span class="text-xs px-2.5 py-1 bg-emerald-100 text-emerald-800 font-mono font-bold border border-emerald-300">Server: 3000 OK</span>
           </h2>
-          <p class="text-xs text-slate-500 mt-0.5">Click any route below to send a live HTTP request to the NestJS backend and see real responses.</p>
+          <p class="text-xs text-slate-500 mt-1">Click any route below to send a live HTTP request to the NestJS backend and see real responses.</p>
         </div>
 
-        <button onclick="runAllRouteDiagnostics()" class="px-4 py-2 text-xs font-bold rounded-md bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover shadow-xs transition-colors">
-          ⚡ Run All Test Routes
+        <button onclick="runAllRouteDiagnostics()" class="px-5 py-2.5 text-xs font-bold bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors border border-cc-yellow">
+          Run All Test Routes
         </button>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <!-- Buttons Column -->
         <div class="lg:col-span-6 space-y-3">
-          <div class="text-xs font-bold uppercase text-slate-500">Available Endpoints:</div>
+          <div class="text-xs font-bold uppercase text-slate-600 tracking-wider">Available Endpoints:</div>
           <div id="route-buttons-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
             <!-- Rendered by JS -->
           </div>
         </div>
 
         <!-- Terminal Viewer Column -->
-        <div class="lg:col-span-6 rounded-lg bg-cc-navy text-slate-200 border border-cc-slate p-4 font-mono text-xs shadow-md">
+        <div class="lg:col-span-6 bg-cc-navy text-slate-200 border border-cc-slate p-5 font-mono text-xs shadow-md">
           <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-3">
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
-              <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
-              <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
-              <span id="inspector-endpoint" class="ml-2 font-medium text-slate-300">Ready</span>
+              <span class="text-slate-400 uppercase text-[10px] tracking-wider">[TERMINAL]</span>
+              <span id="inspector-endpoint" class="ml-2 font-medium text-slate-200">Ready</span>
             </div>
-            <span id="inspector-status" class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-800 text-slate-300">
+            <span id="inspector-status" class="px-2.5 py-0.5 text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
               IDLE
             </span>
           </div>
@@ -314,18 +315,18 @@
 
   <!-- MODAL: BOOK DETAILS & REVIEW -->
   <div id="book-modal" class="fixed inset-0 z-50 bg-black/60 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-lg border border-cc-border max-w-xl w-full p-6 space-y-5 max-h-[90vh] overflow-y-auto shadow-xl">
-      <div class="flex items-start justify-between gap-4 border-b border-slate-200 pb-3">
+    <div class="bg-white border border-cc-border max-w-xl w-full p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div class="flex items-start justify-between gap-4 border-b border-slate-200 pb-4">
         <div>
-          <span id="modal-category" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold uppercase">CATEGORY</span>
-          <h3 id="modal-title" class="text-xl font-bold text-cc-navy mt-1.5">Book Title</h3>
-          <p id="modal-author" class="text-xs text-slate-500 mt-0.5">Author</p>
+          <span id="modal-category" class="text-[10px] font-mono px-2 py-0.5 bg-slate-100 text-slate-700 font-bold uppercase border border-slate-200">CATEGORY</span>
+          <h3 id="modal-title" class="text-xl font-bold text-cc-navy mt-2">Book Title</h3>
+          <p id="modal-author" class="text-xs text-slate-500 mt-1">Author</p>
         </div>
-        <button onclick="closeBookModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
+        <button onclick="closeBookModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold px-2 py-1">✕</button>
       </div>
 
       <!-- Quick Details -->
-      <div class="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-md border border-slate-200 text-xs font-mono">
+      <div class="grid grid-cols-3 gap-3 bg-slate-50 p-4 border border-slate-200 text-xs font-mono">
         <div>
           <span class="text-slate-400 block text-[10px]">ISBN</span>
           <span id="modal-isbn" class="font-bold text-cc-navy truncate block">--</span>
@@ -336,53 +337,53 @@
         </div>
         <div>
           <span class="text-slate-400 block text-[10px]">RATING</span>
-          <span id="modal-rating" class="font-bold text-amber-500">★ 0.0</span>
+          <span id="modal-rating" class="font-bold text-amber-600">0.0 / 5.0</span>
         </div>
       </div>
 
       <!-- Description -->
       <div>
-        <h4 class="text-xs font-bold uppercase text-slate-500 mb-1">About this book</h4>
+        <h4 class="text-xs font-bold uppercase text-slate-600 mb-1">About this book</h4>
         <p id="modal-description" class="text-xs text-slate-700 leading-relaxed">Description goes here.</p>
       </div>
 
       <!-- Borrow Button -->
-      <div class="pt-2">
-        <button id="modal-borrow-btn" onclick="handleBorrowModalBook()" class="w-full py-2.5 px-4 text-xs font-bold rounded-md bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors shadow-xs">
+      <div>
+        <button id="modal-borrow-btn" onclick="handleBorrowModalBook()" class="w-full py-3 px-4 text-xs font-bold bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors border border-cc-yellow">
           Borrow this Book (POST /borrows)
         </button>
       </div>
 
       <!-- Reviews Section -->
-      <div class="border-t border-slate-200 pt-4 space-y-3">
+      <div class="border-t border-slate-200 pt-5 space-y-4">
         <div class="flex items-center justify-between">
           <h4 class="text-xs font-bold uppercase text-slate-700">Reviews & Ratings</h4>
           <span id="modal-review-count" class="text-xs text-slate-400 font-mono">0 Reviews</span>
         </div>
 
         <!-- Add Review Form -->
-        <form id="add-review-form" onsubmit="handleReviewSubmit(event)" class="bg-slate-50 p-3 rounded-md border border-slate-200 space-y-2 text-xs">
-          <div class="flex items-center justify-between gap-2">
+        <form id="add-review-form" onsubmit="handleReviewSubmit(event)" class="bg-slate-50 p-4 border border-slate-200 space-y-3 text-xs">
+          <div class="flex items-center justify-between gap-3">
             <span class="font-semibold text-slate-700">Leave a review:</span>
-            <div class="flex items-center gap-1.5">
-              <label class="text-slate-500">Stars:</label>
-              <select name="rating" class="px-2 py-1 rounded border border-slate-300 bg-white font-medium">
-                <option value="5">★★★★★ (5)</option>
-                <option value="4">★★★★☆ (4)</option>
-                <option value="3">★★★☆☆ (3)</option>
-                <option value="2">★★☆☆☆ (2)</option>
-                <option value="1">★☆☆☆☆ (1)</option>
+            <div class="flex items-center gap-2">
+              <label class="text-slate-500">Rating:</label>
+              <select name="rating" class="px-2.5 py-1 border border-slate-300 bg-white font-medium">
+                <option value="5">5 Stars (Masterpiece)</option>
+                <option value="4">4 Stars (Great)</option>
+                <option value="3">3 Stars (Good)</option>
+                <option value="2">2 Stars (Fair)</option>
+                <option value="1">1 Star (Poor)</option>
               </select>
             </div>
           </div>
-          <input name="comment" type="text" placeholder="Write a short comment..." class="w-full px-3 py-1.5 rounded border border-slate-300 bg-white focus:outline-none focus:border-cc-navy">
-          <button type="submit" class="w-full py-1.5 px-3 rounded bg-cc-navy text-white font-semibold hover:bg-cc-slate transition-colors">
+          <input name="comment" type="text" placeholder="Write a short comment..." class="w-full px-3 py-2 border border-slate-300 bg-white focus:outline-none focus:border-cc-navy">
+          <button type="submit" class="w-full py-2 px-4 bg-cc-navy text-white font-semibold hover:bg-cc-slate transition-colors">
             Submit Review (POST /reviews)
           </button>
         </form>
 
         <!-- Reviews List -->
-        <div id="modal-reviews-list" class="space-y-2 max-h-40 overflow-y-auto">
+        <div id="modal-reviews-list" class="space-y-2.5 max-h-44 overflow-y-auto">
           <!-- Filled by JS -->
         </div>
       </div>
@@ -392,23 +393,23 @@
 
   <!-- MODAL: LOGIN & REGISTER -->
   <div id="auth-modal" class="fixed inset-0 z-50 bg-black/60 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-lg border border-cc-border max-w-sm w-full p-6 space-y-5 shadow-xl">
+    <div class="bg-white border border-cc-border max-w-sm w-full p-6 sm:p-7 space-y-5 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-200 pb-3">
         <h3 class="text-lg font-bold text-cc-navy">User Authentication</h3>
-        <button onclick="toggleAuthModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
+        <button onclick="toggleAuthModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold px-1">✕</button>
       </div>
 
       <!-- Quick Switch Strip -->
-      <div class="bg-slate-50 p-3 rounded-md border border-slate-200 space-y-2">
+      <div class="bg-slate-50 p-3.5 border border-slate-200 space-y-2">
         <span class="text-[11px] font-bold uppercase text-slate-500 block">Quick One-Click Login:</span>
         <div class="grid grid-cols-2 gap-2 text-xs">
-          <button onclick="quickLogin('curator')" class="p-2 rounded bg-white border border-slate-300 hover:border-cc-navy text-left">
+          <button onclick="quickLogin('curator')" class="p-2.5 bg-white border border-slate-300 hover:border-cc-navy text-left transition-colors">
             <div class="font-bold text-cc-navy">Admin User</div>
-            <div class="text-[10px] text-amber-600 font-mono">Role: ADMIN</div>
+            <div class="text-[10px] text-amber-700 font-mono">Role: ADMIN</div>
           </button>
-          <button onclick="quickLogin('reader')" class="p-2 rounded bg-white border border-slate-300 hover:border-cc-navy text-left">
+          <button onclick="quickLogin('reader')" class="p-2.5 bg-white border border-slate-300 hover:border-cc-navy text-left transition-colors">
             <div class="font-bold text-cc-navy">Reader User</div>
-            <div class="text-[10px] text-emerald-600 font-mono">Role: USER</div>
+            <div class="text-[10px] text-emerald-700 font-mono">Role: USER</div>
           </button>
         </div>
       </div>
@@ -416,56 +417,56 @@
       <!-- Login / Register Switch Tabs -->
       <div class="flex border-b border-slate-200 text-xs">
         <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2 font-bold text-cc-navy border-b-2 border-cc-navy">Sign In</button>
-        <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 text-slate-500 hover:text-cc-navy">Register New Account</button>
+        <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 text-slate-500 hover:text-cc-navy">Register Account</button>
       </div>
 
       <!-- Login Form -->
-      <form id="login-form" onsubmit="handleLogin(event)" class="space-y-3">
+      <form id="login-form" onsubmit="handleLogin(event)" class="space-y-3.5">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Email</label>
-          <input required name="email" type="email" placeholder="curator@bookvault.org" class="w-full text-xs px-3 py-2 rounded border border-slate-300 focus:outline-none focus:border-cc-navy">
+          <input required name="email" type="email" placeholder="curator@bookvault.org" class="w-full text-xs px-3 py-2 border border-slate-300 focus:outline-none focus:border-cc-navy">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
-          <input required name="password" type="password" value="vault123" class="w-full text-xs px-3 py-2 rounded border border-slate-300 focus:outline-none focus:border-cc-navy">
+          <input required name="password" type="password" value="vault123" class="w-full text-xs px-3 py-2 border border-slate-300 focus:outline-none focus:border-cc-navy">
         </div>
-        <button type="submit" class="w-full py-2 px-3 text-xs font-bold rounded bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors shadow-xs">
+        <button type="submit" class="w-full py-2.5 px-3 text-xs font-bold bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors border border-cc-yellow">
           Sign In (POST /auth/login)
         </button>
       </form>
 
       <!-- Register Form -->
-      <form id="register-form" onsubmit="handleRegister(event)" class="space-y-3 hidden">
+      <form id="register-form" onsubmit="handleRegister(event)" class="space-y-3.5 hidden">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
-          <input required name="name" type="text" placeholder="Ada Lovelace" class="w-full text-xs px-3 py-2 rounded border border-slate-300 focus:outline-none focus:border-cc-navy">
+          <input required name="name" type="text" placeholder="Ada Lovelace" class="w-full text-xs px-3 py-2 border border-slate-300 focus:outline-none focus:border-cc-navy">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Email</label>
-          <input required name="email" type="email" placeholder="ada@example.com" class="w-full text-xs px-3 py-2 rounded border border-slate-300 focus:outline-none focus:border-cc-navy">
+          <input required name="email" type="email" placeholder="ada@example.com" class="w-full text-xs px-3 py-2 border border-slate-300 focus:outline-none focus:border-cc-navy">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Password (min 6 characters)</label>
-          <input required name="password" type="password" minlength="6" placeholder="••••••••" class="w-full text-xs px-3 py-2 rounded border border-slate-300 focus:outline-none focus:border-cc-navy">
+          <input required name="password" type="password" minlength="6" placeholder="••••••••" class="w-full text-xs px-3 py-2 border border-slate-300 focus:outline-none focus:border-cc-navy">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Role</label>
-          <select name="role" class="w-full text-xs px-3 py-2 rounded border border-slate-300 bg-white">
+          <select name="role" class="w-full text-xs px-3 py-2 border border-slate-300 bg-white">
             <option value="USER">USER (Reader)</option>
             <option value="ADMIN">ADMIN (Curator)</option>
           </select>
         </div>
-        <button type="submit" class="w-full py-2 px-3 text-xs font-bold rounded bg-cc-navy text-white hover:bg-cc-slate transition-colors">
+        <button type="submit" class="w-full py-2.5 px-3 text-xs font-bold bg-cc-navy text-white hover:bg-cc-slate transition-colors">
           Create Account (POST /auth/register)
         </button>
       </form>
 
-      <div id="auth-error-msg" class="hidden text-xs text-rose-600 bg-rose-50 p-2.5 rounded border border-rose-200"></div>
+      <div id="auth-error-msg" class="hidden text-xs text-rose-700 bg-rose-50 p-2.5 border border-rose-200 font-medium"></div>
     </div>
   </div>
 
   <!-- TOAST NOTIFICATION CONTAINER -->
-  <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
 
   <!-- CLIENT APPLICATION JAVASCRIPT -->
   <script>
@@ -489,10 +490,10 @@
     function showToast(message, type = 'info') {
       const c = document.getElementById('toast-container');
       const el = document.createElement('div');
-      el.className = `px-3.5 py-2 text-xs font-semibold rounded-md shadow-lg pointer-events-auto flex items-center gap-2 transition-all ${
-        type === 'error' ? 'bg-rose-600 text-white' : 'bg-cc-navy text-white border border-slate-700'
+      el.className = `px-4 py-2.5 text-xs font-semibold shadow-lg pointer-events-auto flex items-center gap-2 transition-all ${
+        type === 'error' ? 'bg-rose-700 text-white border border-rose-800' : 'bg-cc-navy text-white border border-slate-700'
       }`;
-      el.innerHTML = `<span>${type === 'error' ? '✕' : '✓'}</span><span>${escapeHtml(message)}</span>`;
+      el.innerHTML = `<span class="font-mono font-bold text-[11px]">${type === 'error' ? '[ERROR]' : '[OK]'}</span><span>${escapeHtml(message)}</span>`;
       c.appendChild(el);
       setTimeout(() => {
         el.style.opacity = '0';
@@ -509,9 +510,9 @@
         if (sec) sec.classList.toggle('hidden', t !== tab);
         if (btn) {
           if (t === tab) {
-            btn.className = 'nav-tab px-3 py-1.5 rounded-md hover:text-white hover:bg-cc-slate text-white bg-cc-slate transition-colors';
+            btn.className = 'nav-tab px-4 py-2 border border-slate-600 text-white bg-cc-slate transition-colors';
           } else {
-            btn.className = 'nav-tab px-3 py-1.5 rounded-md hover:text-white hover:bg-cc-slate transition-colors';
+            btn.className = 'nav-tab px-4 py-2 border border-transparent hover:text-white hover:bg-cc-slate transition-colors';
           }
         }
       });
@@ -657,11 +658,11 @@
         nameEl.innerText = currentUser.name;
         badgeEl.innerText = currentUser.role;
         badgeEl.className = currentUser.role === 'ADMIN'
-          ? 'font-mono text-[10px] px-1.5 py-0.5 rounded bg-cc-yellow text-cc-navy font-bold uppercase'
-          : 'font-mono text-[10px] px-1.5 py-0.5 rounded bg-emerald-500 text-white font-bold uppercase';
+          ? 'font-mono text-[10px] px-2 py-0.5 bg-cc-yellow text-cc-navy font-bold uppercase'
+          : 'font-mono text-[10px] px-2 py-0.5 bg-emerald-600 text-white font-bold uppercase';
         
         authBtn.innerText = 'Sign Out';
-        authBtn.className = 'text-xs font-bold px-3 py-1.5 rounded-md bg-slate-700 text-slate-200 hover:bg-slate-600 transition-colors';
+        authBtn.className = 'text-xs font-bold px-4 py-2 bg-slate-700 text-slate-200 hover:bg-slate-600 transition-colors border border-slate-600';
         authBtn.onclick = () => {
           currentToken = null;
           currentUser = null;
@@ -673,7 +674,7 @@
       } else {
         pill.classList.add('hidden');
         authBtn.innerText = 'Sign In';
-        authBtn.className = 'text-xs font-bold px-3.5 py-1.5 rounded-md bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors';
+        authBtn.className = 'text-xs font-bold px-5 py-2.5 bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors border border-cc-yellow';
         authBtn.onclick = toggleAuthModal;
       }
     }
@@ -692,7 +693,7 @@
         updateOperationalStats();
       } catch (err) {
         document.getElementById('books-grid').innerHTML = `
-          <div class="col-span-full p-6 text-center text-rose-600 text-xs">
+          <div class="col-span-full p-6 text-center text-rose-700 text-xs bg-white border border-rose-200">
             Failed to connect to BookVault server: ${err.message}
           </div>
         `;
@@ -703,7 +704,7 @@
       const grid = document.getElementById('books-grid');
       if (books.length === 0) {
         grid.innerHTML = `
-          <div class="col-span-full py-12 text-center text-slate-500 text-sm">
+          <div class="col-span-full py-16 text-center text-slate-500 text-sm bg-white border border-cc-border">
             No books found matching your filters.
           </div>
         `;
@@ -711,18 +712,18 @@
       }
 
       grid.innerHTML = books.map(book => `
-        <div class="bg-white rounded-lg border border-cc-border p-5 hover:border-slate-400 transition-all flex flex-col justify-between shadow-xs">
-          <div class="space-y-2.5">
+        <div class="bg-white border border-cc-border p-5 hover:border-slate-400 transition-all flex flex-col justify-between shadow-xs">
+          <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">${book.category}</span>
-              <span class="text-xs font-semibold ${book.is_available ? 'text-emerald-600' : 'text-rose-600'}">
-                ${book.is_available ? '● Available' : '○ Borrowed'}
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200">${book.category}</span>
+              <span class="text-xs font-bold ${book.is_available ? 'text-emerald-700' : 'text-rose-700'}">
+                ${book.is_available ? 'Available' : 'Borrowed'}
               </span>
             </div>
 
             <div>
               <h3 class="text-base font-bold text-cc-navy leading-snug">${escapeHtml(book.title)}</h3>
-              <p class="text-xs text-slate-500 mt-0.5">by <span class="font-medium text-slate-700">${escapeHtml(book.author)}</span></p>
+              <p class="text-xs text-slate-500 mt-1">by <span class="font-medium text-slate-800">${escapeHtml(book.author)}</span></p>
             </div>
 
             <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed">
@@ -730,18 +731,18 @@
             </p>
           </div>
 
-          <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
+          <div class="pt-4 mt-5 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
             <span class="text-[11px] text-slate-400 truncate max-w-[120px]">${book.isbn}</span>
             <div class="flex items-center gap-2">
-              <button onclick="openBookModal(${book.id})" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-cc-navy font-semibold text-xs transition-colors">
+              <button onclick="openBookModal(${book.id})" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-cc-navy font-semibold text-xs border border-slate-300 transition-colors">
                 View & Review
               </button>
               ${book.is_available ? `
-                <button onclick="quickBorrow(${book.id})" class="px-2.5 py-1 rounded bg-cc-yellow hover:bg-cc-yellowHover text-cc-navy font-bold text-xs transition-colors">
+                <button onclick="quickBorrow(${book.id})" class="px-3 py-1.5 bg-cc-yellow hover:bg-cc-yellowHover text-cc-navy font-bold text-xs border border-cc-yellow transition-colors">
                   Borrow
                 </button>
               ` : `
-                <button disabled class="px-2.5 py-1 rounded bg-slate-100 text-slate-400 text-xs cursor-not-allowed">
+                <button disabled class="px-3 py-1.5 bg-slate-100 text-slate-400 text-xs border border-slate-200 cursor-not-allowed">
                   Loaned
                 </button>
               `}
@@ -755,9 +756,9 @@
       currentCategory = cat;
       document.querySelectorAll('.cat-chip').forEach(btn => {
         if (btn.dataset.cat === cat) {
-          btn.className = 'cat-chip px-2.5 py-1 rounded font-semibold bg-white text-cc-navy shadow-xs';
+          btn.className = 'cat-chip px-3 py-1 font-semibold bg-white text-cc-navy border border-slate-300 shadow-xs';
         } else {
-          btn.className = 'cat-chip px-2.5 py-1 rounded text-slate-600 hover:text-cc-navy';
+          btn.className = 'cat-chip px-3 py-1 text-slate-600 hover:text-cc-navy border border-transparent';
         }
       });
       fetchBooks();
@@ -792,7 +793,7 @@
         });
         const json = await res.json();
         if (!res.ok) throw new Error(json.message || 'Borrow failed');
-        showToast('Book borrowed successfully!');
+        showToast('Book borrowed successfully');
         await fetchBooks();
         fetchMyBorrows();
       } catch (err) {
@@ -819,16 +820,16 @@
 
         if (book.is_available) {
           availEl.innerText = 'Available';
-          availEl.className = 'font-bold text-emerald-600';
+          availEl.className = 'font-bold text-emerald-700';
           borrowBtn.disabled = false;
           borrowBtn.innerText = 'Borrow this Book (POST /borrows)';
-          borrowBtn.className = 'w-full py-2.5 px-4 text-xs font-bold rounded-md bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors cursor-pointer';
+          borrowBtn.className = 'w-full py-3 px-4 text-xs font-bold bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors border border-cc-yellow cursor-pointer';
         } else {
           availEl.innerText = 'Currently Borrowed';
-          availEl.className = 'font-bold text-rose-600';
+          availEl.className = 'font-bold text-rose-700';
           borrowBtn.disabled = true;
           borrowBtn.innerText = 'Currently Checked Out';
-          borrowBtn.className = 'w-full py-2.5 px-4 text-xs font-bold rounded-md bg-slate-200 text-slate-500 cursor-not-allowed';
+          borrowBtn.className = 'w-full py-3 px-4 text-xs font-bold bg-slate-200 text-slate-500 border border-slate-300 cursor-not-allowed';
         }
 
         await fetchModalReviews(bookId);
@@ -855,20 +856,20 @@
         const reviews = json.data || [];
         const avg = json.average_rating || 0;
 
-        document.getElementById('modal-rating').innerText = `★ ${avg.toFixed(1)}`;
+        document.getElementById('modal-rating').innerText = `${avg.toFixed(1)} / 5.0`;
         document.getElementById('modal-review-count').innerText = `${json.count || 0} Reviews`;
 
         const list = document.getElementById('modal-reviews-list');
         if (reviews.length === 0) {
-          list.innerHTML = `<div class="text-xs text-slate-400 py-1 italic">No reviews yet. Be the first to leave one!</div>`;
+          list.innerHTML = `<div class="text-xs text-slate-400 py-2 italic">No reviews yet. Be the first to leave one.</div>`;
           return;
         }
 
         list.innerHTML = reviews.map(r => `
-          <div class="bg-slate-50 p-2.5 rounded border border-slate-200 text-xs">
+          <div class="bg-slate-50 p-3 border border-slate-200 text-xs">
             <div class="flex items-center justify-between text-slate-600">
               <span class="font-bold text-cc-navy">${escapeHtml(r.reviewer_name || 'Reader')}</span>
-              <span class="text-amber-500 font-mono">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+              <span class="text-slate-700 font-mono font-bold">${r.rating} / 5</span>
             </div>
             ${r.comment ? `<p class="text-slate-700 mt-1">${escapeHtml(r.comment)}</p>` : ''}
           </div>
@@ -909,7 +910,7 @@
         });
         const json = await res.json();
         if (!res.ok) throw new Error(json.message || 'Review submission failed');
-        showToast('Review submitted!');
+        showToast('Review submitted successfully');
         form.reset();
         await fetchModalReviews(activeModalBook.id);
       } catch (err) {
@@ -922,7 +923,7 @@
       const container = document.getElementById('borrows-container');
       if (!currentUser) {
         container.innerHTML = `
-          <div class="p-8 text-center bg-white rounded-lg border border-cc-border text-slate-500 text-sm space-y-2">
+          <div class="p-8 text-center bg-white border border-cc-border text-slate-500 text-sm space-y-3">
             <p>You need to be signed in to see your borrowed books.</p>
             <button onclick="toggleAuthModal()" class="text-xs font-bold text-cc-navy underline">Sign in or use Demo Account →</button>
           </div>
@@ -937,39 +938,39 @@
 
         if (borrows.length === 0) {
           container.innerHTML = `
-            <div class="p-8 text-center bg-white rounded-lg border border-cc-border text-slate-500 text-sm">
-              You haven't borrowed any books yet. Check out the catalog to borrow one!
+            <div class="p-8 text-center bg-white border border-cc-border text-slate-500 text-sm">
+              You have no active loans. Browse the catalog to borrow a book.
             </div>
           `;
           return;
         }
 
         container.innerHTML = `
-          <div class="overflow-x-auto bg-white rounded-lg border border-cc-border">
+          <div class="overflow-x-auto bg-white border border-cc-border">
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-mono text-[10px]">
                 <tr>
-                  <th class="p-3">ID</th>
-                  <th class="p-3">Title</th>
-                  <th class="p-3">Author</th>
-                  <th class="p-3">Borrowed On</th>
-                  <th class="p-3">Status</th>
-                  <th class="p-3 text-right">Action</th>
+                  <th class="p-3.5">ID</th>
+                  <th class="p-3.5">Title</th>
+                  <th class="p-3.5">Author</th>
+                  <th class="p-3.5">Borrowed On</th>
+                  <th class="p-3.5">Status</th>
+                  <th class="p-3.5 text-right">Action</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
                 ${borrows.map(b => `
                   <tr class="hover:bg-slate-50">
-                    <td class="p-3 font-mono text-slate-400">#${b.id}</td>
-                    <td class="p-3 font-semibold text-cc-navy">${escapeHtml(b.book_title)}</td>
-                    <td class="p-3 text-slate-500">${escapeHtml(b.book_author || '')}</td>
-                    <td class="p-3 font-mono text-slate-500">${formatDate(b.borrowed_at)}</td>
-                    <td class="p-3 font-bold font-mono text-[11px] ${b.status === 'BORROWED' ? 'text-amber-600' : 'text-emerald-600'}">
+                    <td class="p-3.5 font-mono text-slate-400">#${b.id}</td>
+                    <td class="p-3.5 font-semibold text-cc-navy">${escapeHtml(b.book_title)}</td>
+                    <td class="p-3.5 text-slate-500">${escapeHtml(b.book_author || '')}</td>
+                    <td class="p-3.5 font-mono text-slate-500">${formatDate(b.borrowed_at)}</td>
+                    <td class="p-3.5 font-bold font-mono text-[11px] ${b.status === 'BORROWED' ? 'text-amber-700' : 'text-emerald-700'}">
                       ${b.status}
                     </td>
-                    <td class="p-3 text-right">
+                    <td class="p-3.5 text-right">
                       ${b.status === 'BORROWED' ? `
-                        <button onclick="handleReturnBook(${b.id})" class="px-2.5 py-1 text-xs font-semibold rounded bg-cc-navy text-white hover:bg-cc-slate transition-colors">
+                        <button onclick="handleReturnBook(${b.id})" class="px-3 py-1.5 text-xs font-semibold bg-cc-navy text-white hover:bg-cc-slate transition-colors border border-cc-navy">
                           Return Book
                         </button>
                       ` : `
@@ -983,7 +984,7 @@
           </div>
         `;
       } catch (err) {
-        container.innerHTML = `<div class="p-6 text-center text-rose-600 text-xs">Failed to load borrows: ${err.message}</div>`;
+        container.innerHTML = `<div class="p-6 text-center text-rose-700 text-xs bg-white border border-rose-200">Failed to load borrows: ${err.message}</div>`;
       }
     }
 
@@ -995,7 +996,7 @@
         });
         const json = await res.json();
         if (!res.ok) throw new Error(json.message || 'Return failed');
-        showToast('Book returned successfully!');
+        showToast('Book returned successfully');
         await fetchBooks();
         fetchMyBorrows();
       } catch (err) {
@@ -1007,7 +1008,7 @@
     async function handleCreateBook(e) {
       e.preventDefault();
       if (!currentUser || currentUser.role !== 'ADMIN') {
-        showToast('Admin role required! Log in as Curator Eleanor above.', 'error');
+        showToast('Admin role required. Sign in as Admin (Curator) above.', 'error');
         return;
       }
       const form = e.target;
@@ -1025,7 +1026,7 @@
         });
         const json = await res.json();
         if (!res.ok) throw new Error(json.message || 'Failed to add book');
-        showToast(`Book "${title}" added successfully!`);
+        showToast(`Book "${title}" added successfully`);
         form.reset();
         await fetchBooks();
         switchTab('catalog');
@@ -1039,9 +1040,9 @@
       const container = document.getElementById('users-table-container');
       if (!currentUser || currentUser.role !== 'ADMIN') {
         container.innerHTML = `
-          <div class="text-center py-6 text-slate-500 text-xs space-y-2">
+          <div class="text-center py-8 text-slate-500 text-xs space-y-3">
             <p>Admin privileges required to view users.</p>
-            <button onclick="quickLogin('curator')" class="px-3 py-1 rounded bg-cc-navy text-white font-semibold">Switch to Admin Account</button>
+            <button onclick="quickLogin('curator')" class="px-4 py-2 bg-cc-navy text-white font-semibold border border-cc-navy">Switch to Admin Account</button>
           </div>
         `;
         return;
@@ -1056,23 +1057,23 @@
           <table class="w-full text-left text-xs font-mono">
             <thead class="bg-slate-50 text-slate-500 text-[10px] uppercase border-b border-slate-200">
               <tr>
-                <th class="p-2.5">ID</th>
-                <th class="p-2.5 font-sans">Name</th>
-                <th class="p-2.5">Email</th>
-                <th class="p-2.5">Role</th>
-                <th class="p-2.5 text-center">Borrows</th>
-                <th class="p-2.5 text-right">Action</th>
+                <th class="p-3">ID</th>
+                <th class="p-3 font-sans">Name</th>
+                <th class="p-3">Email</th>
+                <th class="p-3">Role</th>
+                <th class="p-3 text-center">Borrows</th>
+                <th class="p-3 text-right">Action</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
               ${users.map(u => `
                 <tr>
-                  <td class="p-2.5 text-slate-400">#${u.id}</td>
-                  <td class="p-2.5 font-sans font-medium text-cc-navy">${escapeHtml(u.name)}</td>
-                  <td class="p-2.5 text-slate-500">${escapeHtml(u.email)}</td>
-                  <td class="p-2.5 font-bold ${u.role === 'ADMIN' ? 'text-amber-600' : 'text-emerald-600'}">${u.role}</td>
-                  <td class="p-2.5 text-center text-slate-600">${u.total_borrows || 0}</td>
-                  <td class="p-2.5 text-right">
+                  <td class="p-3 text-slate-400">#${u.id}</td>
+                  <td class="p-3 font-sans font-medium text-cc-navy">${escapeHtml(u.name)}</td>
+                  <td class="p-3 text-slate-500">${escapeHtml(u.email)}</td>
+                  <td class="p-3 font-bold ${u.role === 'ADMIN' ? 'text-amber-700' : 'text-emerald-700'}">${u.role}</td>
+                  <td class="p-3 text-center text-slate-600">${u.total_borrows || 0}</td>
+                  <td class="p-3 text-right">
                     <button onclick="toggleUserRole(${u.id}, '${u.role === 'ADMIN' ? 'USER' : 'ADMIN'}')" class="text-cc-navy font-bold hover:underline">
                       Make ${u.role === 'ADMIN' ? 'USER' : 'ADMIN'}
                     </button>
@@ -1083,7 +1084,7 @@
           </table>
         `;
       } catch (err) {
-        container.innerHTML = `<div class="text-xs text-rose-600 py-3">${err.message}</div>`;
+        container.innerHTML = `<div class="text-xs text-rose-700 py-3">${err.message}</div>`;
       }
     }
 
@@ -1119,7 +1120,7 @@
     function setupRouteButtons() {
       const container = document.getElementById('route-buttons-grid');
       container.innerHTML = routesManifest.map(r => `
-        <button onclick="testRoute('${r.method}', '${r.url}', ${r.auth})" class="p-2.5 text-left bg-white border border-slate-300 hover:border-cc-navy hover:bg-slate-50 rounded-md transition-colors flex items-center justify-between">
+        <button onclick="testRoute('${r.method}', '${r.url}', ${r.auth})" class="p-3 text-left bg-white border border-slate-300 hover:border-cc-navy hover:bg-slate-50 transition-colors flex items-center justify-between">
           <span class="truncate font-semibold text-cc-navy">${r.name}</span>
           <span class="text-[10px] text-slate-500 uppercase">${r.method}</span>
         </button>
@@ -1133,7 +1134,7 @@
 
       endpointEl.innerText = `${method} ${url}`;
       statusEl.innerText = 'WAIT';
-      statusEl.className = 'px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500 text-cc-navy';
+      statusEl.className = 'px-2.5 py-0.5 text-[11px] font-bold bg-amber-500 text-cc-navy border border-amber-600';
       bodyEl.innerText = '// Sending request...';
 
       const t0 = performance.now();
@@ -1145,12 +1146,12 @@
 
         statusEl.innerText = `${res.status} ${res.statusText} (${latency}ms)`;
         statusEl.className = res.ok 
-          ? 'px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500 text-white' 
-          : 'px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500 text-white';
+          ? 'px-2.5 py-0.5 text-[11px] font-bold bg-emerald-600 text-white border border-emerald-700' 
+          : 'px-2.5 py-0.5 text-[11px] font-bold bg-rose-600 text-white border border-rose-700';
         bodyEl.innerText = JSON.stringify(data, null, 2);
       } catch (err) {
         statusEl.innerText = 'ERROR';
-        statusEl.className = 'px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500 text-white';
+        statusEl.className = 'px-2.5 py-0.5 text-[11px] font-bold bg-rose-600 text-white border border-rose-700';
         bodyEl.innerText = `// Error: ${err.message}`;
       }
     }
