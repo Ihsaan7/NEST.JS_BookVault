@@ -11,7 +11,8 @@ export class AppController {
   @Get()
   getHello(@Req() req?: Request, @Res({ passthrough: true }) res?: Response): any {
     const accept = req?.headers?.['accept'] || '';
-    if (accept.includes('text/html') && res) {
+    const isDoc = req?.headers?.['sec-fetch-dest'] === 'document';
+    if ((accept.includes('text/html') || isDoc) && res) {
       const htmlPath = path.join(process.cwd(), 'public', 'index.html');
       if (fs.existsSync(htmlPath)) {
         res.type('html');

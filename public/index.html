@@ -8,369 +8,303 @@
   <meta property="og:title" content="Book-Vault">
   <meta property="og:description" content="Curated minimalist rare book archive, catalog and circulation management system built on NestJS and SQLite.">
 
-  <!-- Google Fonts: Cormorant Garamond for Archival Display, Plus Jakarta Sans for Body Prose, JetBrains Mono for Numbers -->
+  <!-- Inter & JetBrains Mono Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS via CDN -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
-            serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
             mono: ['"JetBrains Mono"', 'monospace'],
           },
           colors: {
-            archival: {
-              paper: '#FBF9F5',
-              sand: '#F4EFEA',
-              card: '#FFFFFF',
-              ink: '#1A1816',
-              charcoal: '#2D2926',
-              muted: '#78716C',
-              divider: '#E7E2DA',
-              gold: '#B8860B',
-              amber: '#966D14',
-              forest: '#23392E',
-              crimson: '#8C2D19'
-            },
-            vault: {
-              black: '#121110',
-              surface: '#1A1817',
-              raised: '#22201D',
-              border: '#332F2B',
-              text: '#EFECE6',
-              subtext: '#9E988F'
+            cc: {
+              navy: '#10162F',
+              slate: '#1E2548',
+              card: '#1F2438',
+              yellow: '#FFD300',
+              yellowHover: '#FFE600',
+              cyan: '#38E1FF',
+              border: '#E2E8F0',
+              bg: '#F8F9FA',
+              text: '#10162F',
+              muted: '#64748B',
             }
           }
         }
       }
     }
   </script>
-
   <style>
-    /* Archival fine-line styling & print aesthetics */
     body {
-      background-color: #FBF9F5;
-      color: #1A1816;
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-      text-rendering: optimizeLegibility;
-      -webkit-font-smoothing: antialiased;
-    }
-    .dark body {
-      background-color: #121110;
-      color: #EFECE6;
-    }
-    ::selection {
-      background-color: #B8860B;
-      color: #FFFFFF;
-    }
-    .book-plate {
-      background: radial-gradient(circle at 10% 20%, rgba(184, 134, 11, 0.04) 0%, transparent 60%);
+      background-color: #F8F9FA;
+      color: #10162F;
+      font-family: 'Inter', system-ui, sans-serif;
     }
     .tabular-nums {
       font-variant-numeric: tabular-nums;
     }
-    /* Minimal custom scrollbars */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #F4EFEA;
-    }
-    .dark ::-webkit-scrollbar-track {
-      background: #1A1817;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #D5CEBE;
-      border-radius: 3px;
-    }
-    .dark ::-webkit-scrollbar-thumb {
-      background: #332F2B;
-    }
   </style>
 </head>
-<body class="min-h-full flex flex-col selection:bg-archival-gold selection:text-white">
+<body class="min-h-full flex flex-col bg-cc-bg text-cc-text">
 
-  <!-- TOP BAR CONTRACT (Strict 3 Zones: Brand Title | 4-6 Nav Links | Primary Actions) -->
-  <header class="sticky top-0 z-40 bg-archival-paper/95 backdrop-blur-sm border-b border-archival-divider px-6 lg:px-12 py-3.5 transition-colors">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
-      
-      <!-- Zone 1: Single text element wordmark in display face -->
-      <a href="#catalog" class="text-2xl font-serif font-bold tracking-tight text-archival-ink hover:text-archival-gold transition-colors shrink-0">
-        Book-Vault
-      </a>
+  <!-- CODECADEMY-STYLE TOP NAVIGATION BAR -->
+  <header class="bg-cc-navy text-white sticky top-0 z-40 shadow-sm border-b border-cc-slate">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Brand Wordmark -->
+        <div class="flex items-center gap-6">
+          <a href="#" onclick="switchTab('catalog')" class="flex items-center gap-2.5 text-lg font-bold tracking-tight text-white hover:text-cc-yellow transition-colors">
+            <span class="w-8 h-8 rounded-md bg-cc-yellow text-cc-navy flex items-center justify-center font-black text-sm">BV</span>
+            <span>BookVault</span>
+          </a>
 
-      <!-- Zone 2: 4-6 Clean text navigation links -->
-      <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-archival-charcoal/80">
-        <a href="#catalog" class="hover:text-archival-gold transition-colors">Archival Catalog</a>
-        <a href="#circulation" class="hover:text-archival-gold transition-colors">My Circulation</a>
-        <a href="#dashboard" class="hover:text-archival-gold transition-colors">Scholar Records</a>
-        <a href="#curator" id="nav-curator" class="hover:text-archival-gold transition-colors">Curator Desk</a>
-        <a href="#inspector" class="hover:text-archival-gold transition-colors">Route Inspector</a>
-      </nav>
-
-      <!-- Zone 3: 1-2 Primary actions (Quick demo identity switcher & status) -->
-      <div class="flex items-center gap-3 shrink-0">
-        <!-- Identity Indicator -->
-        <div id="user-indicator" class="hidden sm:flex items-center gap-2 text-xs text-archival-muted">
-          <span id="user-name-display" class="font-medium text-archival-ink truncate max-w-[120px]">Visitor</span>
-          <span aria-hidden="true">·</span>
-          <span id="user-role-display" class="font-mono text-[11px] uppercase tracking-wider text-archival-amber">Guest</span>
+          <!-- Main Nav Tabs -->
+          <nav class="hidden md:flex items-center gap-1 text-sm font-medium text-slate-300">
+            <button onclick="switchTab('catalog')" id="tab-btn-catalog" class="nav-tab px-3 py-1.5 rounded-md hover:text-white hover:bg-cc-slate text-white bg-cc-slate transition-colors">
+              Books
+            </button>
+            <button onclick="switchTab('borrows')" id="tab-btn-borrows" class="nav-tab px-3 py-1.5 rounded-md hover:text-white hover:bg-cc-slate transition-colors">
+              My Borrowed Books
+            </button>
+            <button onclick="switchTab('add-book')" id="tab-btn-add-book" class="nav-tab px-3 py-1.5 rounded-md hover:text-white hover:bg-cc-slate transition-colors">
+              Add Book (Admin)
+            </button>
+            <button onclick="switchTab('users')" id="tab-btn-users" class="nav-tab px-3 py-1.5 rounded-md hover:text-white hover:bg-cc-slate transition-colors">
+              Users (Admin)
+            </button>
+            <button onclick="switchTab('tester')" id="tab-btn-tester" class="nav-tab px-3 py-1.5 rounded-md hover:text-white hover:bg-cc-slate transition-colors flex items-center gap-1.5">
+              <span>API Tester</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-cc-yellow text-cc-navy font-bold">LIVE</span>
+            </button>
+          </nav>
         </div>
 
-        <button id="auth-btn" onclick="toggleAuthModal()" class="px-3.5 py-1.5 text-xs font-medium text-archival-ink border border-archival-divider hover:border-archival-gold hover:text-archival-gold transition-colors whitespace-nowrap">
-          Sign In / Demo
-        </button>
-      </div>
+        <!-- Identity / Quick Switcher -->
+        <div class="flex items-center gap-3">
+          <div id="user-pill" class="hidden sm:flex items-center gap-2 text-xs bg-cc-slate px-3 py-1.5 rounded-full border border-slate-700">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span id="user-name" class="font-medium text-white truncate max-w-[120px]">User</span>
+            <span id="user-role-badge" class="font-mono text-[10px] px-1.5 py-0.2 rounded bg-cc-yellow text-cc-navy font-bold uppercase">USER</span>
+          </div>
 
+          <button id="auth-main-btn" onclick="toggleAuthModal()" class="text-xs font-bold px-3.5 py-1.5 rounded-md bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors">
+            Sign In
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Row -->
+    <div class="md:hidden flex overflow-x-auto px-4 py-2 border-t border-cc-slate gap-2 text-xs font-medium text-slate-300">
+      <button onclick="switchTab('catalog')" class="whitespace-nowrap px-2.5 py-1 rounded hover:bg-cc-slate">Books</button>
+      <button onclick="switchTab('borrows')" class="whitespace-nowrap px-2.5 py-1 rounded hover:bg-cc-slate">My Borrows</button>
+      <button onclick="switchTab('add-book')" class="whitespace-nowrap px-2.5 py-1 rounded hover:bg-cc-slate">Add Book</button>
+      <button onclick="switchTab('users')" class="whitespace-nowrap px-2.5 py-1 rounded hover:bg-cc-slate">Users</button>
+      <button onclick="switchTab('tester')" class="whitespace-nowrap px-2.5 py-1 rounded hover:bg-cc-slate text-cc-yellow">API Tester</button>
     </div>
   </header>
 
-  <!-- MAIN VIEWPORT -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 py-8 space-y-12">
-
-    <!-- HERO SECTION: Institutional Weight & Curatorial Moto -->
-    <section class="border-b border-archival-divider pb-10">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
-        <div class="lg:col-span-8 space-y-4">
-          <div class="text-xs uppercase tracking-widest text-archival-amber font-mono">
-            Archival Preservation Register · Est. MMXXVI
-          </div>
-          <h1 class="text-4xl lg:text-5xl font-serif font-medium text-archival-ink leading-[1.15] text-balance">
-            An archival sanctuary for rare volumes, classical treatises, and literary monuments.
-          </h1>
-          <p class="text-base text-archival-muted max-w-2xl leading-relaxed">
-            Preserving intellectual heritage through custodial accession, peer reviews, and controlled scholarly circulation. Powered by a high-integrity NestJS core and SQLite persistent datastore.
-          </p>
-        </div>
-
-        <!-- Quick Accession Operational Strip -->
-        <div class="lg:col-span-4 bg-archival-sand/70 border border-archival-divider p-5 space-y-3">
-          <div class="text-xs font-mono uppercase tracking-wider text-archival-muted">
-            Archive Operational Metrics
-          </div>
-          <div class="grid grid-cols-3 gap-2 text-center">
-            <div class="border-r border-archival-divider pr-2">
-              <div id="stat-books-count" class="text-xl font-serif font-bold text-archival-ink tabular-nums">--</div>
-              <div class="text-[11px] text-archival-muted">Volumes</div>
-            </div>
-            <div class="border-r border-archival-divider pr-2">
-              <div id="stat-avail-count" class="text-xl font-serif font-bold text-archival-forest tabular-nums">--</div>
-              <div class="text-[11px] text-archival-muted">Available</div>
-            </div>
-            <div>
-              <div id="stat-sentry-status" class="text-xl font-serif font-bold text-archival-amber">Active</div>
-              <div class="text-[11px] text-archival-muted">Sentry Watch</div>
-            </div>
-          </div>
-          <div class="pt-2 border-t border-archival-divider flex items-center justify-between text-xs text-archival-muted">
-            <span>Fast Role Switch:</span>
-            <div class="flex items-center gap-2">
-              <button onclick="quickLogin('curator')" class="text-archival-gold hover:underline">Curator (Admin)</button>
-              <span>·</span>
-              <button onclick="quickLogin('reader')" class="text-archival-gold hover:underline">Scholar (User)</button>
-            </div>
-          </div>
-        </div>
+  <!-- QUICK DEMO LOGIN BAR -->
+  <div class="bg-white border-b border-cc-border py-2.5 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+      <div class="flex items-center gap-2 text-slate-600">
+        <span class="font-semibold text-cc-navy">Demo Accounts:</span>
+        <button onclick="quickLogin('curator')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-cc-navy font-medium border border-slate-300 transition-colors">
+          🔑 Admin (Curator)
+        </button>
+        <button onclick="quickLogin('reader')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-cc-navy font-medium border border-slate-300 transition-colors">
+          📖 User (Reader)
+        </button>
       </div>
-    </section>
 
-    <!-- SECTION: ARCHIVAL CATALOG -->
-    <section id="catalog" class="space-y-6">
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-archival-divider pb-4">
+      <div class="flex items-center gap-4 text-slate-500 font-mono text-[11px]">
+        <span>NestJS 12 + SQLite</span>
+        <span>•</span>
+        <span id="stats-total-books">Books: --</span>
+        <span>•</span>
+        <span id="stats-avail-books" class="text-emerald-600 font-semibold">Available: --</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+    <!-- TAB 1: BOOKS CATALOG -->
+    <section id="tab-catalog" class="space-y-6">
+      <!-- Title & Search Controls -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-lg border border-cc-border shadow-xs">
         <div>
-          <span class="text-xs uppercase tracking-widest text-archival-muted font-mono">Archive Collection</span>
-          <h2 class="text-2xl lg:text-3xl font-serif font-medium text-archival-ink">Curated Shelf Catalog</h2>
+          <h1 class="text-xl font-bold text-cc-navy">Library Books Catalog</h1>
+          <p class="text-xs text-slate-500 mt-0.5">Browse available books, filter by category, or borrow a book.</p>
         </div>
 
-        <!-- Functional Filter Tabs & Search Controls -->
         <div class="flex flex-wrap items-center gap-3">
-          <!-- Category Tabs -->
-          <div class="flex items-center gap-1 p-1 bg-archival-sand border border-archival-divider text-xs">
-            <button onclick="setCategoryFilter('')" data-category="" class="cat-btn px-2.5 py-1 font-medium bg-white text-archival-ink shadow-xs">All</button>
-            <button onclick="setCategoryFilter('NON_FICTION')" data-category="NON_FICTION" class="cat-btn px-2.5 py-1 text-archival-muted hover:text-archival-ink">Non-Fiction</button>
-            <button onclick="setCategoryFilter('FICTION')" data-category="FICTION" class="cat-btn px-2.5 py-1 text-archival-muted hover:text-archival-ink">Fiction</button>
-            <button onclick="setCategoryFilter('MYSTERY')" data-category="MYSTERY" class="cat-btn px-2.5 py-1 text-archival-muted hover:text-archival-ink">Mystery</button>
-            <button onclick="setCategoryFilter('SCI_FI')" data-category="SCI_FI" class="cat-btn px-2.5 py-1 text-archival-muted hover:text-archival-ink">Sci-Fi</button>
-            <button onclick="setCategoryFilter('FANTASY')" data-category="FANTASY" class="cat-btn px-2.5 py-1 text-archival-muted hover:text-archival-ink">Fantasy</button>
-            <button onclick="setCategoryFilter('BIOGRAPHY')" data-category="BIOGRAPHY" class="cat-btn px-2.5 py-1 text-archival-muted hover:text-archival-ink">Biography</button>
+          <!-- Category Filter Chips -->
+          <div class="flex items-center gap-1 overflow-x-auto p-1 bg-slate-100 rounded-md border border-slate-200 text-xs">
+            <button onclick="filterCategory('')" data-cat="" class="cat-chip px-2.5 py-1 rounded font-semibold bg-white text-cc-navy shadow-xs">All</button>
+            <button onclick="filterCategory('NON_FICTION')" data-cat="NON_FICTION" class="cat-chip px-2.5 py-1 rounded text-slate-600 hover:text-cc-navy">Non-Fiction</button>
+            <button onclick="filterCategory('FICTION')" data-cat="FICTION" class="cat-chip px-2.5 py-1 rounded text-slate-600 hover:text-cc-navy">Fiction</button>
+            <button onclick="filterCategory('MYSTERY')" data-cat="MYSTERY" class="cat-chip px-2.5 py-1 rounded text-slate-600 hover:text-cc-navy">Mystery</button>
+            <button onclick="filterCategory('SCI_FI')" data-cat="SCI_FI" class="cat-chip px-2.5 py-1 rounded text-slate-600 hover:text-cc-navy">Sci-Fi</button>
+            <button onclick="filterCategory('FANTASY')" data-cat="FANTASY" class="cat-chip px-2.5 py-1 rounded text-slate-600 hover:text-cc-navy">Fantasy</button>
+            <button onclick="filterCategory('BIOGRAPHY')" data-cat="BIOGRAPHY" class="cat-chip px-2.5 py-1 rounded text-slate-600 hover:text-cc-navy">Biography</button>
           </div>
 
           <!-- Search Input -->
-          <div class="relative">
+          <div class="relative w-full sm:w-56">
             <input 
               id="search-input" 
               type="text" 
-              placeholder="Search title..." 
+              placeholder="Search books..." 
               oninput="handleSearch(this.value)"
-              class="w-44 lg:w-56 text-xs px-3 py-1.5 border border-archival-divider bg-white text-archival-ink placeholder:text-archival-muted/70 focus:outline-none focus:border-archival-gold"
+              class="w-full text-xs px-3 py-2 rounded-md border border-slate-300 bg-white text-cc-navy placeholder:text-slate-400 focus:outline-none focus:border-cc-navy"
             >
           </div>
         </div>
       </div>
 
       <!-- Book Grid -->
-      <div id="books-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Filled dynamically -->
-        <div class="col-span-full text-center py-16 text-archival-muted">
-          Accessing archival stacks...
+      <div id="books-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="col-span-full text-center py-12 text-slate-400 text-sm">
+          Loading library books...
         </div>
       </div>
     </section>
 
-    <!-- SECTION: READER CIRCULATION & LOANS -->
-    <section id="circulation" class="space-y-6 pt-6 border-t border-archival-divider">
-      <div class="flex items-end justify-between border-b border-archival-divider pb-4">
+    <!-- TAB 2: MY BORROWED BOOKS -->
+    <section id="tab-borrows" class="space-y-6 hidden">
+      <div class="bg-white p-5 rounded-lg border border-cc-border shadow-xs flex items-center justify-between">
         <div>
-          <span class="text-xs uppercase tracking-widest text-archival-muted font-mono">Scholarly Loans</span>
-          <h2 class="text-2xl lg:text-3xl font-serif font-medium text-archival-ink">Active Loans & Lending Ledger</h2>
+          <h2 class="text-xl font-bold text-cc-navy">My Borrowed Books</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Track your active and returned books. Click Return to give a book back.</p>
         </div>
-        <button onclick="fetchMyBorrows()" class="text-xs font-mono text-archival-gold hover:underline">
-          Refresh Ledger ↻
+        <button onclick="fetchMyBorrows()" class="text-xs font-semibold px-3 py-1.5 rounded-md border border-slate-300 hover:bg-slate-50 text-slate-700">
+          Refresh List ↻
         </button>
       </div>
 
       <div id="borrows-container">
-        <!-- Loaded dynamically -->
-        <div class="p-8 text-center bg-white border border-archival-divider text-archival-muted text-sm">
-          Please authenticate to view your personal circulation ledger and return borrowed volumes.
-        </div>
+        <!-- Rendered by JS -->
       </div>
     </section>
 
-    <!-- SECTION: SCHOLAR DASHBOARD -->
-    <section id="dashboard" class="space-y-6 pt-6 border-t border-archival-divider">
-      <div class="flex items-end justify-between border-b border-archival-divider pb-4">
+    <!-- TAB 3: ADD BOOK (ADMIN) -->
+    <section id="tab-add-book" class="space-y-6 hidden">
+      <div class="max-w-2xl mx-auto bg-white p-6 sm:p-8 rounded-lg border border-cc-border shadow-xs space-y-5">
         <div>
-          <span class="text-xs uppercase tracking-widest text-archival-muted font-mono">Scholarly Profile</span>
-          <h2 class="text-2xl lg:text-3xl font-serif font-medium text-archival-ink">Fellow Academic Record</h2>
+          <h2 class="text-xl font-bold text-cc-navy">Add a New Book</h2>
+          <p class="text-xs text-slate-500 mt-1">Requires an Admin account (Curator). Fill in the book details below to add it to the catalog.</p>
         </div>
-        <button onclick="fetchDashboard()" class="text-xs font-mono text-archival-gold hover:underline">
-          Reload Record ↻
+
+        <form id="create-book-form" onsubmit="handleCreateBook(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Book Title *</label>
+            <input required name="title" type="text" placeholder="e.g. Clean Code" class="w-full text-sm px-3.5 py-2 rounded-md border border-slate-300 focus:outline-none focus:border-cc-navy">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Author *</label>
+              <input required name="author" type="text" placeholder="e.g. Robert C. Martin" class="w-full text-sm px-3.5 py-2 rounded-md border border-slate-300 focus:outline-none focus:border-cc-navy">
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Category *</label>
+              <select name="category" class="w-full text-sm px-3.5 py-2 rounded-md border border-slate-300 focus:outline-none focus:border-cc-navy bg-white">
+                <option value="NON_FICTION">NON_FICTION</option>
+                <option value="FICTION">FICTION</option>
+                <option value="MYSTERY">MYSTERY</option>
+                <option value="SCI_FI">SCI_FI</option>
+                <option value="FANTASY">FANTASY</option>
+                <option value="BIOGRAPHY">BIOGRAPHY</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">ISBN Number *</label>
+            <input required name="isbn" type="text" placeholder="e.g. 978-0132350884" class="w-full text-sm px-3.5 py-2 rounded-md border border-slate-300 focus:outline-none focus:border-cc-navy font-mono">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Description</label>
+            <textarea name="description" rows="3" placeholder="Brief summary of the book..." class="w-full text-sm px-3.5 py-2 rounded-md border border-slate-300 focus:outline-none focus:border-cc-navy"></textarea>
+          </div>
+
+          <button type="submit" class="w-full py-2.5 px-4 text-xs font-bold rounded-md bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors shadow-xs">
+            Save Book to Database (POST /books)
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 4: USERS MANAGEMENT (ADMIN) -->
+    <section id="tab-users" class="space-y-6 hidden">
+      <div class="bg-white p-5 rounded-lg border border-cc-border shadow-xs flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-cc-navy">User Management</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Admin view to see all registered users and promote/demote roles.</p>
+        </div>
+        <button onclick="fetchUsersList()" class="text-xs font-semibold px-3 py-1.5 rounded-md bg-cc-navy text-white hover:bg-cc-slate">
+          Load Users (GET /users)
         </button>
       </div>
 
-      <div id="dashboard-container" class="bg-white border border-archival-divider p-6">
-        <p class="text-sm text-archival-muted">Sign in with an account to view reading records, lending stats, and critique history.</p>
+      <div id="users-table-container" class="bg-white rounded-lg border border-cc-border p-4">
+        <p class="text-xs text-slate-400 text-center py-6">Click "Load Users" above or sign in as Admin to see user records.</p>
       </div>
     </section>
 
-    <!-- SECTION: CURATOR DESK (ADMIN ONLY) -->
-    <section id="curator" class="space-y-6 pt-6 border-t border-archival-divider">
-      <div class="flex items-end justify-between border-b border-archival-divider pb-4">
+    <!-- TAB 5: API ROUTE TESTER (CODECADEMY THEME) -->
+    <section id="tab-tester" class="space-y-6 hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-lg border border-cc-border shadow-xs">
         <div>
-          <span class="text-xs uppercase tracking-widest text-archival-amber font-mono">Curatorial Stacks & Governance</span>
-          <h2 class="text-2xl lg:text-3xl font-serif font-medium text-archival-ink">Curator Accession Desk</h2>
+          <h2 class="text-xl font-bold text-cc-navy flex items-center gap-2">
+            <span>API Route Tester & Inspector</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono font-medium">Server: 3000 OK</span>
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">Click any route below to send a live HTTP request to the NestJS backend and see real responses.</p>
         </div>
-        <div class="text-xs font-mono text-archival-muted">
-          Role Required: <span class="text-archival-amber font-semibold">ADMIN</span>
-        </div>
+
+        <button onclick="runAllRouteDiagnostics()" class="px-4 py-2 text-xs font-bold rounded-md bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover shadow-xs transition-colors">
+          ⚡ Run All Test Routes
+        </button>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <!-- Accession New Volume Form -->
-        <div class="lg:col-span-6 bg-white border border-archival-divider p-6 space-y-4">
-          <h3 class="text-lg font-serif font-semibold text-archival-ink">Accession New Volume to Vault</h3>
-          <p class="text-xs text-archival-muted">Add a cataloged volume into the SQLite archive with verifiable ISBN and category.</p>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- Buttons Column -->
+        <div class="lg:col-span-6 space-y-3">
+          <div class="text-xs font-bold uppercase text-slate-500">Available Endpoints:</div>
+          <div id="route-buttons-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
 
-          <form id="create-book-form" onsubmit="handleCreateBook(event)" class="space-y-3.5">
-            <div>
-              <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Volume Title</label>
-              <input required name="title" type="text" placeholder="e.g. Hypnerotomachia Poliphili" class="w-full text-sm px-3 py-2 border border-archival-divider focus:border-archival-gold focus:outline-none bg-archival-paper">
+        <!-- Terminal Viewer Column -->
+        <div class="lg:col-span-6 rounded-lg bg-cc-navy text-slate-200 border border-cc-slate p-4 font-mono text-xs shadow-md">
+          <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+              <span id="inspector-endpoint" class="ml-2 font-medium text-slate-300">Ready</span>
             </div>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Author / Scrivener</label>
-                <input required name="author" type="text" placeholder="e.g. Francesco Colonna" class="w-full text-sm px-3 py-2 border border-archival-divider focus:border-archival-gold focus:outline-none bg-archival-paper">
-              </div>
-              <div>
-                <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Classification</label>
-                <select required name="category" class="w-full text-sm px-3 py-2 border border-archival-divider focus:border-archival-gold focus:outline-none bg-archival-paper">
-                  <option value="NON_FICTION">NON_FICTION</option>
-                  <option value="FICTION">FICTION</option>
-                  <option value="MYSTERY">MYSTERY</option>
-                  <option value="SCI_FI">SCI_FI</option>
-                  <option value="FANTASY">FANTASY</option>
-                  <option value="BIOGRAPHY">BIOGRAPHY</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-xs font-mono uppercase text-archival-muted mb-1">ISBN / Accession Number</label>
-              <input required name="isbn" type="text" placeholder="e.g. 978-0500288863" class="w-full text-sm px-3 py-2 border border-archival-divider focus:border-archival-gold focus:outline-none bg-archival-paper font-mono">
-            </div>
-
-            <div>
-              <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Curatorial Abstract & Notes</label>
-              <textarea name="description" rows="3" placeholder="Historical context, binding material, physical condition notes..." class="w-full text-sm px-3 py-2 border border-archival-divider focus:border-archival-gold focus:outline-none bg-archival-paper"></textarea>
-            </div>
-
-            <button type="submit" class="w-full py-2.5 px-4 text-xs font-medium text-white bg-archival-ink hover:bg-archival-charcoal transition-colors">
-              Deposit Volume to Stacks (POST /books)
-            </button>
-          </form>
-        </div>
-
-        <!-- User Directory & Governance -->
-        <div class="lg:col-span-6 bg-white border border-archival-divider p-6 space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="text-lg font-serif font-semibold text-archival-ink">Archive Fellowship Register</h3>
-            <button onclick="fetchUsersList()" class="text-xs font-mono text-archival-gold hover:underline">
-              Fetch Users (GET /users)
-            </button>
-          </div>
-          <p class="text-xs text-archival-muted">Audit registered scholars, historical borrowing counts, and administer security roles.</p>
-
-          <div id="users-table-container" class="overflow-x-auto">
-            <div class="text-xs text-archival-muted py-6 text-center">Click "Fetch Users" to inspect registered users via Admin credentials.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION: ROUTE INSPECTOR & SENTRY HEALTH -->
-    <section id="inspector" class="space-y-6 pt-6 border-t border-archival-divider">
-      <div class="flex items-end justify-between border-b border-archival-divider pb-4">
-        <div>
-          <span class="text-xs uppercase tracking-widest text-archival-muted font-mono">Backend Diagnostics & Sentry</span>
-          <h2 class="text-2xl lg:text-3xl font-serif font-medium text-archival-ink">Route Verification Console</h2>
-        </div>
-        <div class="flex items-center gap-2">
-          <button onclick="runAllRouteDiagnostics()" class="px-3 py-1 text-xs font-mono bg-archival-ink text-white hover:bg-archival-charcoal transition-colors">
-            Run Live Suite (All 18 Routes)
-          </button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Diagnostic Action Matrix -->
-        <div class="lg:col-span-7 space-y-3">
-          <div class="text-xs text-archival-muted">
-            Click any endpoint below to dispatch an actual HTTP request against the running NestJS server and inspect headers, status code, latency, and payload:
+            <span id="inspector-status" class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-800 text-slate-300">
+              IDLE
+            </span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono" id="route-buttons-grid">
-            <!-- Route Buttons populated by JS -->
-          </div>
-        </div>
-
-        <!-- Live Response Payload Viewer -->
-        <div class="lg:col-span-5 bg-archival-charcoal text-archival-paper p-4 font-mono text-xs space-y-2 border border-archival-charcoal">
-          <div class="flex items-center justify-between border-b border-white/10 pb-2 text-[11px] text-archival-muted">
-            <span id="inspector-endpoint">Ready for query</span>
-            <span id="inspector-status" class="tabular-nums font-bold">200 OK</span>
-          </div>
-          <pre id="inspector-body" class="overflow-auto max-h-72 text-[11px] leading-relaxed text-archival-sand/90">
-Click a route button to test live responses.
+          <pre id="inspector-body" class="overflow-x-auto max-h-96 text-[12px] leading-relaxed text-emerald-400">
+// Click any endpoint on the left to test live response data.
           </pre>
         </div>
       </div>
@@ -378,193 +312,163 @@ Click a route button to test live responses.
 
   </main>
 
-  <!-- FOOTER -->
-  <footer class="mt-16 border-t border-archival-divider bg-archival-sand/50 py-8 px-6 lg:px-12 text-xs text-archival-muted">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <span class="font-serif font-semibold text-sm text-archival-ink">Book-Vault</span>
-        <span aria-hidden="true">·</span>
-        <span>A Classical Rare Book Preservation System</span>
-      </div>
-      <div class="flex items-center gap-4 font-mono text-[11px]">
-        <span>NestJS v12 Core</span>
-        <span aria-hidden="true">·</span>
-        <span>SQLite v3 Engine</span>
-        <span aria-hidden="true">·</span>
-        <span>Sentry Monitored</span>
-      </div>
-    </div>
-  </footer>
-
-  <!-- MODAL: BOOK ACCESSION DETAIL & ACTIONS (Reviews & Loans) -->
-  <div id="book-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4">
-    <div class="bg-white border border-archival-divider max-w-2xl w-full p-6 lg:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
-      <div class="flex items-start justify-between gap-4 border-b border-archival-divider pb-4">
+  <!-- MODAL: BOOK DETAILS & REVIEW -->
+  <div id="book-modal" class="fixed inset-0 z-50 bg-black/60 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-lg border border-cc-border max-w-xl w-full p-6 space-y-5 max-h-[90vh] overflow-y-auto shadow-xl">
+      <div class="flex items-start justify-between gap-4 border-b border-slate-200 pb-3">
         <div>
-          <div id="modal-category" class="text-xs uppercase tracking-widest text-archival-amber font-mono">NON_FICTION</div>
-          <h3 id="modal-title" class="text-2xl font-serif font-bold text-archival-ink mt-1">Book Title</h3>
-          <div id="modal-author" class="text-sm text-archival-muted mt-0.5">Author Name</div>
+          <span id="modal-category" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold uppercase">CATEGORY</span>
+          <h3 id="modal-title" class="text-xl font-bold text-cc-navy mt-1.5">Book Title</h3>
+          <p id="modal-author" class="text-xs text-slate-500 mt-0.5">Author</p>
         </div>
-        <button onclick="closeBookModal()" class="text-archival-muted hover:text-archival-ink text-xl font-serif">✕</button>
+        <button onclick="closeBookModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
       </div>
 
-      <!-- Book Metadata List -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-3 bg-archival-paper border border-archival-divider px-4 text-xs font-mono">
+      <!-- Quick Details -->
+      <div class="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-md border border-slate-200 text-xs font-mono">
         <div>
-          <span class="text-archival-muted block text-[10px] uppercase">Accession ID</span>
-          <span id="modal-id" class="text-archival-ink font-semibold tabular-nums">#0</span>
+          <span class="text-slate-400 block text-[10px]">ISBN</span>
+          <span id="modal-isbn" class="font-bold text-cc-navy truncate block">--</span>
         </div>
         <div>
-          <span class="text-archival-muted block text-[10px] uppercase">ISBN Code</span>
-          <span id="modal-isbn" class="text-archival-ink font-semibold truncate block">--</span>
+          <span class="text-slate-400 block text-[10px]">STATUS</span>
+          <span id="modal-availability" class="font-bold text-emerald-600">Available</span>
         </div>
         <div>
-          <span class="text-archival-muted block text-[10px] uppercase">Shelf Status</span>
-          <span id="modal-availability" class="font-semibold text-archival-forest">Available</span>
-        </div>
-        <div>
-          <span class="text-archival-muted block text-[10px] uppercase">Critique Score</span>
-          <span id="modal-rating" class="font-semibold text-archival-gold">★ 0.0</span>
+          <span class="text-slate-400 block text-[10px]">RATING</span>
+          <span id="modal-rating" class="font-bold text-amber-500">★ 0.0</span>
         </div>
       </div>
 
       <!-- Description -->
-      <div class="space-y-2">
-        <h4 class="text-xs font-mono uppercase tracking-wider text-archival-muted">Curatorial Record & Abstract</h4>
-        <p id="modal-description" class="text-sm text-archival-charcoal leading-relaxed font-serif text-base">
-          Description
-        </p>
+      <div>
+        <h4 class="text-xs font-bold uppercase text-slate-500 mb-1">About this book</h4>
+        <p id="modal-description" class="text-xs text-slate-700 leading-relaxed">Description goes here.</p>
       </div>
 
-      <!-- Loan / Borrow Action Button -->
-      <div class="border-t border-archival-divider pt-4 flex items-center justify-between gap-4">
-        <div id="modal-loan-status" class="text-xs text-archival-muted">
-          Loan period: 14 days renewal.
-        </div>
-        <button id="modal-borrow-btn" onclick="handleBorrowModalBook()" class="px-5 py-2 text-xs font-medium text-white bg-archival-ink hover:bg-archival-charcoal transition-colors">
-          Request Physical Loan (POST /borrows)
+      <!-- Borrow Button -->
+      <div class="pt-2">
+        <button id="modal-borrow-btn" onclick="handleBorrowModalBook()" class="w-full py-2.5 px-4 text-xs font-bold rounded-md bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors shadow-xs">
+          Borrow this Book (POST /borrows)
         </button>
       </div>
 
       <!-- Reviews Section -->
-      <div class="border-t border-archival-divider pt-4 space-y-4">
+      <div class="border-t border-slate-200 pt-4 space-y-3">
         <div class="flex items-center justify-between">
-          <h4 class="text-xs font-mono uppercase tracking-wider text-archival-muted">Scholarly Critiques & Peer Reviews</h4>
-          <span id="modal-review-count" class="text-xs text-archival-muted font-mono">0 Reviews</span>
+          <h4 class="text-xs font-bold uppercase text-slate-700">Reviews & Ratings</h4>
+          <span id="modal-review-count" class="text-xs text-slate-400 font-mono">0 Reviews</span>
         </div>
 
         <!-- Add Review Form -->
-        <form id="add-review-form" onsubmit="handleReviewSubmit(event)" class="bg-archival-sand/60 p-4 border border-archival-divider space-y-3">
-          <div class="flex items-center justify-between gap-4">
-            <span class="text-xs font-medium text-archival-ink">Add Peer Evaluation:</span>
-            <div class="flex items-center gap-2">
-              <label class="text-xs text-archival-muted">Rating:</label>
-              <select name="rating" class="text-xs px-2 py-1 border border-archival-divider bg-white">
-                <option value="5">★★★★★ (5 - Masterpiece)</option>
-                <option value="4">★★★★☆ (4 - Exceptional)</option>
-                <option value="3">★★★☆☆ (3 - Worthy)</option>
-                <option value="2">★★☆☆☆ (2 - Flawed)</option>
-                <option value="1">★☆☆☆☆ (1 - Poor)</option>
+        <form id="add-review-form" onsubmit="handleReviewSubmit(event)" class="bg-slate-50 p-3 rounded-md border border-slate-200 space-y-2 text-xs">
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-semibold text-slate-700">Leave a review:</span>
+            <div class="flex items-center gap-1.5">
+              <label class="text-slate-500">Stars:</label>
+              <select name="rating" class="px-2 py-1 rounded border border-slate-300 bg-white font-medium">
+                <option value="5">★★★★★ (5)</option>
+                <option value="4">★★★★☆ (4)</option>
+                <option value="3">★★★☆☆ (3)</option>
+                <option value="2">★★☆☆☆ (2)</option>
+                <option value="1">★☆☆☆☆ (1)</option>
               </select>
             </div>
           </div>
-          <input name="comment" type="text" placeholder="Write scholarly notes, citations, or physical binding commentary..." class="w-full text-xs px-3 py-2 border border-archival-divider bg-white focus:outline-none focus:border-archival-gold">
-          <div class="flex justify-end">
-            <button type="submit" class="px-3 py-1.5 text-xs bg-archival-ink text-white hover:bg-archival-charcoal transition-colors">
-              Submit Review (POST /reviews)
-            </button>
-          </div>
+          <input name="comment" type="text" placeholder="Write a short comment..." class="w-full px-3 py-1.5 rounded border border-slate-300 bg-white focus:outline-none focus:border-cc-navy">
+          <button type="submit" class="w-full py-1.5 px-3 rounded bg-cc-navy text-white font-semibold hover:bg-cc-slate transition-colors">
+            Submit Review (POST /reviews)
+          </button>
         </form>
 
         <!-- Reviews List -->
-        <div id="modal-reviews-list" class="space-y-2.5 max-h-48 overflow-y-auto">
-          <!-- Filled dynamically -->
+        <div id="modal-reviews-list" class="space-y-2 max-h-40 overflow-y-auto">
+          <!-- Filled by JS -->
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- MODAL: AUTHENTICATION / QUICK SWITCH -->
-  <div id="auth-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4">
-    <div class="bg-white border border-archival-divider max-w-md w-full p-6 space-y-6">
-      <div class="flex items-center justify-between border-b border-archival-divider pb-3">
-        <h3 class="text-xl font-serif font-bold text-archival-ink">Scholar Authentication</h3>
-        <button onclick="toggleAuthModal()" class="text-archival-muted hover:text-archival-ink font-serif text-lg">✕</button>
+  <!-- MODAL: LOGIN & REGISTER -->
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-black/60 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-lg border border-cc-border max-w-sm w-full p-6 space-y-5 shadow-xl">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <h3 class="text-lg font-bold text-cc-navy">User Authentication</h3>
+        <button onclick="toggleAuthModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
       </div>
 
       <!-- Quick Switch Strip -->
-      <div class="bg-archival-sand/70 p-3.5 border border-archival-divider space-y-2">
-        <span class="text-xs font-mono uppercase text-archival-muted block">One-Click Demonstration Personas</span>
-        <div class="grid grid-cols-2 gap-2">
-          <button onclick="quickLogin('curator')" class="p-2 text-left bg-white border border-archival-divider hover:border-archival-gold text-xs transition-colors">
-            <div class="font-semibold text-archival-ink">Curator Eleanor</div>
-            <div class="text-[11px] text-archival-amber font-mono">Role: ADMIN</div>
+      <div class="bg-slate-50 p-3 rounded-md border border-slate-200 space-y-2">
+        <span class="text-[11px] font-bold uppercase text-slate-500 block">Quick One-Click Login:</span>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <button onclick="quickLogin('curator')" class="p-2 rounded bg-white border border-slate-300 hover:border-cc-navy text-left">
+            <div class="font-bold text-cc-navy">Admin User</div>
+            <div class="text-[10px] text-amber-600 font-mono">Role: ADMIN</div>
           </button>
-          <button onclick="quickLogin('reader')" class="p-2 text-left bg-white border border-archival-divider hover:border-archival-gold text-xs transition-colors">
-            <div class="font-semibold text-archival-ink">Scholar Julian</div>
-            <div class="text-[11px] text-archival-forest font-mono">Role: USER</div>
+          <button onclick="quickLogin('reader')" class="p-2 rounded bg-white border border-slate-300 hover:border-cc-navy text-left">
+            <div class="font-bold text-cc-navy">Reader User</div>
+            <div class="text-[10px] text-emerald-600 font-mono">Role: USER</div>
           </button>
         </div>
       </div>
 
-      <!-- Login / Register Tabs -->
-      <div class="flex border-b border-archival-divider text-xs">
-        <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2 font-medium text-archival-ink border-b-2 border-archival-gold">Sign In</button>
-        <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 text-archival-muted hover:text-archival-ink">Register Fellow</button>
+      <!-- Login / Register Switch Tabs -->
+      <div class="flex border-b border-slate-200 text-xs">
+        <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2 font-bold text-cc-navy border-b-2 border-cc-navy">Sign In</button>
+        <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 text-slate-500 hover:text-cc-navy">Register New Account</button>
       </div>
 
       <!-- Login Form -->
-      <form id="login-form" onsubmit="handleLogin(event)" class="space-y-3.5">
+      <form id="login-form" onsubmit="handleLogin(event)" class="space-y-3">
         <div>
-          <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Email</label>
-          <input required name="email" type="email" placeholder="curator@bookvault.org" class="w-full text-sm px-3 py-2 border border-archival-divider bg-archival-paper focus:outline-none focus:border-archival-gold">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Email</label>
+          <input required name="email" type="email" placeholder="curator@bookvault.org" class="w-full text-xs px-3 py-2 rounded border border-slate-300 focus:outline-none focus:border-cc-navy">
         </div>
         <div>
-          <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Passphrase</label>
-          <input required name="password" type="password" value="vault123" class="w-full text-sm px-3 py-2 border border-archival-divider bg-archival-paper focus:outline-none focus:border-archival-gold">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+          <input required name="password" type="password" value="vault123" class="w-full text-xs px-3 py-2 rounded border border-slate-300 focus:outline-none focus:border-cc-navy">
         </div>
-        <button type="submit" class="w-full py-2.5 px-4 text-xs font-medium text-white bg-archival-ink hover:bg-archival-charcoal transition-colors">
+        <button type="submit" class="w-full py-2 px-3 text-xs font-bold rounded bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors shadow-xs">
           Sign In (POST /auth/login)
         </button>
       </form>
 
       <!-- Register Form -->
-      <form id="register-form" onsubmit="handleRegister(event)" class="space-y-3.5 hidden">
+      <form id="register-form" onsubmit="handleRegister(event)" class="space-y-3 hidden">
         <div>
-          <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Full Name</label>
-          <input required name="name" type="text" placeholder="Scholar Ada Lovelace" class="w-full text-sm px-3 py-2 border border-archival-divider bg-archival-paper focus:outline-none focus:border-archival-gold">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+          <input required name="name" type="text" placeholder="Ada Lovelace" class="w-full text-xs px-3 py-2 rounded border border-slate-300 focus:outline-none focus:border-cc-navy">
         </div>
         <div>
-          <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Email</label>
-          <input required name="email" type="email" placeholder="ada@history.edu" class="w-full text-sm px-3 py-2 border border-archival-divider bg-archival-paper focus:outline-none focus:border-archival-gold">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Email</label>
+          <input required name="email" type="email" placeholder="ada@example.com" class="w-full text-xs px-3 py-2 rounded border border-slate-300 focus:outline-none focus:border-cc-navy">
         </div>
         <div>
-          <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Passphrase (min 6 chars)</label>
-          <input required name="password" type="password" minlength="6" placeholder="••••••••" class="w-full text-sm px-3 py-2 border border-archival-divider bg-archival-paper focus:outline-none focus:border-archival-gold">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Password (min 6 characters)</label>
+          <input required name="password" type="password" minlength="6" placeholder="••••••••" class="w-full text-xs px-3 py-2 rounded border border-slate-300 focus:outline-none focus:border-cc-navy">
         </div>
         <div>
-          <label class="block text-xs font-mono uppercase text-archival-muted mb-1">Access Role</label>
-          <select name="role" class="w-full text-sm px-3 py-2 border border-archival-divider bg-archival-paper focus:outline-none focus:border-archival-gold">
-            <option value="USER">USER (Fellow Reader)</option>
-            <option value="ADMIN">ADMIN (Vault Curator)</option>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Role</label>
+          <select name="role" class="w-full text-xs px-3 py-2 rounded border border-slate-300 bg-white">
+            <option value="USER">USER (Reader)</option>
+            <option value="ADMIN">ADMIN (Curator)</option>
           </select>
         </div>
-        <button type="submit" class="w-full py-2.5 px-4 text-xs font-medium text-white bg-archival-ink hover:bg-archival-charcoal transition-colors">
-          Register Fellow (POST /auth/register)
+        <button type="submit" class="w-full py-2 px-3 text-xs font-bold rounded bg-cc-navy text-white hover:bg-cc-slate transition-colors">
+          Create Account (POST /auth/register)
         </button>
       </form>
 
-      <div id="auth-error-msg" class="hidden text-xs text-archival-crimson bg-archival-crimson/5 p-2.5 border border-archival-crimson/20"></div>
+      <div id="auth-error-msg" class="hidden text-xs text-rose-600 bg-rose-50 p-2.5 rounded border border-rose-200"></div>
     </div>
   </div>
 
   <!-- TOAST NOTIFICATION CONTAINER -->
-  <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
   <!-- CLIENT APPLICATION JAVASCRIPT -->
   <script>
-    // State
     let currentUser = null;
     let currentToken = localStorage.getItem('bv_token') || null;
     let allBooks = [];
@@ -572,9 +476,8 @@ Click a route button to test live responses.
     let currentSearch = '';
     let activeModalBook = null;
 
-    const API_BASE = ''; // relative to same host
+    const API_BASE = '';
 
-    // Helpers
     function authHeaders() {
       const h = { 'Content-Type': 'application/json' };
       if (currentToken) {
@@ -586,18 +489,38 @@ Click a route button to test live responses.
     function showToast(message, type = 'info') {
       const c = document.getElementById('toast-container');
       const el = document.createElement('div');
-      el.className = `px-4 py-2.5 text-xs font-medium border shadow-md transition-all duration-300 pointer-events-auto flex items-center gap-2 ${
-        type === 'error' ? 'bg-white text-archival-crimson border-archival-crimson' : 'bg-archival-ink text-white border-archival-ink'
+      el.className = `px-3.5 py-2 text-xs font-semibold rounded-md shadow-lg pointer-events-auto flex items-center gap-2 transition-all ${
+        type === 'error' ? 'bg-rose-600 text-white' : 'bg-cc-navy text-white border border-slate-700'
       }`;
-      el.innerHTML = `<span>${type === 'error' ? '✕' : '✓'}</span><span>${message}</span>`;
+      el.innerHTML = `<span>${type === 'error' ? '✕' : '✓'}</span><span>${escapeHtml(message)}</span>`;
       c.appendChild(el);
       setTimeout(() => {
         el.style.opacity = '0';
-        setTimeout(() => el.remove(), 300);
-      }, 3500);
+        setTimeout(() => el.remove(), 250);
+      }, 3000);
     }
 
-    // Modal Handlers
+    // Tab Navigation
+    function switchTab(tab) {
+      const tabs = ['catalog', 'borrows', 'add-book', 'users', 'tester'];
+      tabs.forEach(t => {
+        const sec = document.getElementById(`tab-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (sec) sec.classList.toggle('hidden', t !== tab);
+        if (btn) {
+          if (t === tab) {
+            btn.className = 'nav-tab px-3 py-1.5 rounded-md hover:text-white hover:bg-cc-slate text-white bg-cc-slate transition-colors';
+          } else {
+            btn.className = 'nav-tab px-3 py-1.5 rounded-md hover:text-white hover:bg-cc-slate transition-colors';
+          }
+        }
+      });
+
+      if (tab === 'borrows') fetchMyBorrows();
+      if (tab === 'users') fetchUsersList();
+    }
+
+    // Auth Modal Handlers
     function toggleAuthModal() {
       const m = document.getElementById('auth-modal');
       m.classList.toggle('hidden');
@@ -609,15 +532,14 @@ Click a route button to test live responses.
       document.getElementById('login-form').classList.toggle('hidden', !isLogin);
       document.getElementById('register-form').classList.toggle('hidden', isLogin);
       document.getElementById('tab-login').className = isLogin 
-        ? 'flex-1 py-2 font-medium text-archival-ink border-b-2 border-archival-gold' 
-        : 'flex-1 py-2 text-archival-muted hover:text-archival-ink';
+        ? 'flex-1 py-2 font-bold text-cc-navy border-b-2 border-cc-navy' 
+        : 'flex-1 py-2 text-slate-500 hover:text-cc-navy';
       document.getElementById('tab-register').className = !isLogin 
-        ? 'flex-1 py-2 font-medium text-archival-ink border-b-2 border-archival-gold' 
-        : 'flex-1 py-2 text-archival-muted hover:text-archival-ink';
+        ? 'flex-1 py-2 font-bold text-cc-navy border-b-2 border-cc-navy' 
+        : 'flex-1 py-2 text-slate-500 hover:text-cc-navy';
       document.getElementById('auth-error-msg').classList.add('hidden');
     }
 
-    // Auth Flows
     async function handleLogin(e) {
       e.preventDefault();
       const form = e.target;
@@ -633,11 +555,10 @@ Click a route button to test live responses.
         if (!res.ok) throw new Error(json.message || json.error?.message || 'Login failed');
         currentToken = json.data.token;
         localStorage.setItem('bv_token', currentToken);
-        showToast('Authenticated successfully');
+        showToast('Signed in successfully');
         toggleAuthModal();
         await loadCurrentUser();
         fetchMyBorrows();
-        fetchDashboard();
       } catch (err) {
         const errEl = document.getElementById('auth-error-msg');
         errEl.innerText = err.message;
@@ -660,8 +581,9 @@ Click a route button to test live responses.
         });
         const json = await res.json();
         if (!res.ok) throw new Error(json.message || json.error?.message || 'Registration failed');
-        showToast('Fellow registered. Logging in...');
-        // Automatically login
+        showToast('Account created! Signing you in...');
+        
+        // Auto-login
         const loginRes = await fetch(`${API_BASE}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -689,15 +611,14 @@ Click a route button to test live responses.
           body: JSON.stringify({ email, password })
         });
         const json = await res.json();
-        if (!res.ok) throw new Error('Demo login failed. You can register your own account.');
+        if (!res.ok) throw new Error('Demo login failed');
         currentToken = json.data.token;
         localStorage.setItem('bv_token', currentToken);
-        showToast(`Signed in as ${persona === 'curator' ? 'Curator Eleanor' : 'Scholar Julian'}`);
+        showToast(`Logged in as ${persona === 'curator' ? 'Admin (Curator)' : 'User (Reader)'}`);
         const m = document.getElementById('auth-modal');
         if (!m.classList.contains('hidden')) toggleAuthModal();
         await loadCurrentUser();
         fetchMyBorrows();
-        fetchDashboard();
       } catch (err) {
         showToast(err.message, 'error');
       }
@@ -726,40 +647,38 @@ Click a route button to test live responses.
     }
 
     function updateUserUI() {
-      const ind = document.getElementById('user-indicator');
-      const nameEl = document.getElementById('user-name-display');
-      const roleEl = document.getElementById('user-role-display');
-      const authBtn = document.getElementById('auth-btn');
-      const navCurator = document.getElementById('nav-curator');
+      const pill = document.getElementById('user-pill');
+      const nameEl = document.getElementById('user-name');
+      const badgeEl = document.getElementById('user-role-badge');
+      const authBtn = document.getElementById('auth-main-btn');
 
       if (currentUser) {
-        ind.classList.remove('hidden');
+        pill.classList.remove('hidden');
         nameEl.innerText = currentUser.name;
-        roleEl.innerText = currentUser.role;
+        badgeEl.innerText = currentUser.role;
+        badgeEl.className = currentUser.role === 'ADMIN'
+          ? 'font-mono text-[10px] px-1.5 py-0.5 rounded bg-cc-yellow text-cc-navy font-bold uppercase'
+          : 'font-mono text-[10px] px-1.5 py-0.5 rounded bg-emerald-500 text-white font-bold uppercase';
+        
         authBtn.innerText = 'Sign Out';
+        authBtn.className = 'text-xs font-bold px-3 py-1.5 rounded-md bg-slate-700 text-slate-200 hover:bg-slate-600 transition-colors';
         authBtn.onclick = () => {
           currentToken = null;
           currentUser = null;
           localStorage.removeItem('bv_token');
           updateUserUI();
-          showToast('Signed out of archival terminal');
+          showToast('Signed out');
           fetchMyBorrows();
-          fetchDashboard();
         };
-        if (currentUser.role === 'ADMIN') {
-          navCurator.classList.remove('opacity-40');
-        } else {
-          navCurator.classList.add('opacity-40');
-        }
       } else {
-        ind.classList.add('hidden');
-        authBtn.innerText = 'Sign In / Demo';
+        pill.classList.add('hidden');
+        authBtn.innerText = 'Sign In';
+        authBtn.className = 'text-xs font-bold px-3.5 py-1.5 rounded-md bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors';
         authBtn.onclick = toggleAuthModal;
-        navCurator.classList.add('opacity-40');
       }
     }
 
-    // Books Catalog Flow
+    // Books Catalog
     async function fetchBooks() {
       const params = new URLSearchParams();
       if (currentCategory) params.append('category', currentCategory);
@@ -773,8 +692,8 @@ Click a route button to test live responses.
         updateOperationalStats();
       } catch (err) {
         document.getElementById('books-grid').innerHTML = `
-          <div class="col-span-full p-8 text-center text-archival-crimson">
-            Failed to connect to Book-Vault core: ${err.message}
+          <div class="col-span-full p-6 text-center text-rose-600 text-xs">
+            Failed to connect to BookVault server: ${err.message}
           </div>
         `;
       }
@@ -784,56 +703,61 @@ Click a route button to test live responses.
       const grid = document.getElementById('books-grid');
       if (books.length === 0) {
         grid.innerHTML = `
-          <div class="col-span-full py-16 text-center text-archival-muted">
-            <p class="font-serif text-xl">No archival volumes match this query.</p>
-            <p class="text-xs mt-1">Adjust filters or deposit new volumes through the Curator Desk.</p>
+          <div class="col-span-full py-12 text-center text-slate-500 text-sm">
+            No books found matching your filters.
           </div>
         `;
         return;
       }
 
       grid.innerHTML = books.map(book => `
-        <article class="bg-white border border-archival-divider p-6 hover:border-archival-gold transition-all duration-200 flex flex-col justify-between group">
-          <div class="space-y-3">
-            <div class="flex items-center justify-between text-xs text-archival-muted font-mono">
-              <span>${book.category}</span>
-              <span aria-hidden="true">·</span>
-              <span class="${book.is_available ? 'text-archival-forest font-medium' : 'text-archival-crimson font-medium'}">
-                ${book.is_available ? 'Available' : 'On Scholarly Loan'}
+        <div class="bg-white rounded-lg border border-cc-border p-5 hover:border-slate-400 transition-all flex flex-col justify-between shadow-xs">
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">${book.category}</span>
+              <span class="text-xs font-semibold ${book.is_available ? 'text-emerald-600' : 'text-rose-600'}">
+                ${book.is_available ? '● Available' : '○ Borrowed'}
               </span>
             </div>
 
             <div>
-              <h3 class="text-xl font-serif font-bold text-archival-ink group-hover:text-archival-gold transition-colors leading-snug">
-                ${escapeHtml(book.title)}
-              </h3>
-              <p class="text-xs text-archival-charcoal mt-1">
-                By <span class="font-medium">${escapeHtml(book.author)}</span>
-              </p>
+              <h3 class="text-base font-bold text-cc-navy leading-snug">${escapeHtml(book.title)}</h3>
+              <p class="text-xs text-slate-500 mt-0.5">by <span class="font-medium text-slate-700">${escapeHtml(book.author)}</span></p>
             </div>
 
-            <p class="text-xs text-archival-muted leading-relaxed line-clamp-3">
-              ${escapeHtml(book.description || 'No physical condition annotations logged.')}
+            <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+              ${escapeHtml(book.description || 'No description provided.')}
             </p>
           </div>
 
-          <div class="pt-5 mt-4 border-t border-archival-divider flex items-center justify-between text-xs font-mono">
-            <span class="text-[11px] text-archival-muted truncate max-w-[130px]">${book.isbn}</span>
-            <button onclick="openBookModal(${book.id})" class="text-archival-ink font-semibold group-hover:text-archival-gold flex items-center gap-1 transition-colors">
-              Inspect Volume →
-            </button>
+          <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
+            <span class="text-[11px] text-slate-400 truncate max-w-[120px]">${book.isbn}</span>
+            <div class="flex items-center gap-2">
+              <button onclick="openBookModal(${book.id})" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-cc-navy font-semibold text-xs transition-colors">
+                View & Review
+              </button>
+              ${book.is_available ? `
+                <button onclick="quickBorrow(${book.id})" class="px-2.5 py-1 rounded bg-cc-yellow hover:bg-cc-yellowHover text-cc-navy font-bold text-xs transition-colors">
+                  Borrow
+                </button>
+              ` : `
+                <button disabled class="px-2.5 py-1 rounded bg-slate-100 text-slate-400 text-xs cursor-not-allowed">
+                  Loaned
+                </button>
+              `}
+            </div>
           </div>
-        </article>
+        </div>
       `).join('');
     }
 
-    function setCategoryFilter(cat) {
+    function filterCategory(cat) {
       currentCategory = cat;
-      document.querySelectorAll('.cat-btn').forEach(btn => {
-        if (btn.dataset.category === cat) {
-          btn.className = 'cat-btn px-2.5 py-1 font-medium bg-white text-archival-ink shadow-xs';
+      document.querySelectorAll('.cat-chip').forEach(btn => {
+        if (btn.dataset.cat === cat) {
+          btn.className = 'cat-chip px-2.5 py-1 rounded font-semibold bg-white text-cc-navy shadow-xs';
         } else {
-          btn.className = 'cat-btn px-2.5 py-1 text-archival-muted hover:text-archival-ink';
+          btn.className = 'cat-chip px-2.5 py-1 rounded text-slate-600 hover:text-cc-navy';
         }
       });
       fetchBooks();
@@ -845,16 +769,38 @@ Click a route button to test live responses.
       searchDebounce = setTimeout(() => {
         currentSearch = val.trim();
         fetchBooks();
-      }, 300);
+      }, 250);
     }
 
     function updateOperationalStats() {
-      document.getElementById('stat-books-count').innerText = allBooks.length;
+      document.getElementById('stats-total-books').innerText = `Books: ${allBooks.length}`;
       const avail = allBooks.filter(b => b.is_available).length;
-      document.getElementById('stat-avail-count').innerText = avail;
+      document.getElementById('stats-avail-books').innerText = `Available: ${avail}`;
     }
 
-    // Modal Book Details & Actions
+    async function quickBorrow(bookId) {
+      if (!currentUser) {
+        showToast('Please sign in first (use Demo Admin or Reader above)', 'error');
+        toggleAuthModal();
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/borrows`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({ book_id: bookId })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Borrow failed');
+        showToast('Book borrowed successfully!');
+        await fetchBooks();
+        fetchMyBorrows();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // Book Detail Modal
     async function openBookModal(bookId) {
       try {
         const res = await fetch(`${API_BASE}/books/${bookId}`);
@@ -862,38 +808,36 @@ Click a route button to test live responses.
         const book = json.data;
         activeModalBook = book;
 
-        document.getElementById('modal-id').innerText = `#${book.id}`;
         document.getElementById('modal-category').innerText = book.category;
         document.getElementById('modal-title').innerText = book.title;
-        document.getElementById('modal-author').innerText = `By ${book.author}`;
+        document.getElementById('modal-author').innerText = `by ${book.author}`;
         document.getElementById('modal-isbn').innerText = book.isbn;
-        document.getElementById('modal-description').innerText = book.description || 'No detailed abstract recorded for this accession.';
+        document.getElementById('modal-description').innerText = book.description || 'No description available.';
 
         const availEl = document.getElementById('modal-availability');
         const borrowBtn = document.getElementById('modal-borrow-btn');
 
         if (book.is_available) {
-          availEl.innerText = 'Available in Stacks';
-          availEl.className = 'font-semibold text-archival-forest';
+          availEl.innerText = 'Available';
+          availEl.className = 'font-bold text-emerald-600';
           borrowBtn.disabled = false;
-          borrowBtn.innerText = 'Request Physical Loan (POST /borrows)';
-          borrowBtn.className = 'px-5 py-2 text-xs font-medium text-white bg-archival-ink hover:bg-archival-charcoal transition-colors cursor-pointer';
+          borrowBtn.innerText = 'Borrow this Book (POST /borrows)';
+          borrowBtn.className = 'w-full py-2.5 px-4 text-xs font-bold rounded-md bg-cc-yellow text-cc-navy hover:bg-cc-yellowHover transition-colors cursor-pointer';
         } else {
-          availEl.innerText = 'Circulating (Borrowed)';
-          availEl.className = 'font-semibold text-archival-crimson';
+          availEl.innerText = 'Currently Borrowed';
+          availEl.className = 'font-bold text-rose-600';
           borrowBtn.disabled = true;
-          borrowBtn.innerText = 'Currently Unavailable';
-          borrowBtn.className = 'px-5 py-2 text-xs font-medium text-archival-muted bg-archival-sand border border-archival-divider cursor-not-allowed';
+          borrowBtn.innerText = 'Currently Checked Out';
+          borrowBtn.className = 'w-full py-2.5 px-4 text-xs font-bold rounded-md bg-slate-200 text-slate-500 cursor-not-allowed';
         }
 
-        // Fetch Reviews
         await fetchModalReviews(bookId);
 
         const m = document.getElementById('book-modal');
         m.classList.remove('hidden');
         m.classList.add('flex');
       } catch (err) {
-        showToast(`Failed to load volume: ${err.message}`, 'error');
+        showToast(`Could not open book: ${err.message}`, 'error');
       }
     }
 
@@ -916,54 +860,34 @@ Click a route button to test live responses.
 
         const list = document.getElementById('modal-reviews-list');
         if (reviews.length === 0) {
-          list.innerHTML = `<div class="text-xs text-archival-muted py-2 italic font-serif">No peer critiques yet accessioned. Be the first scholar to review.</div>`;
+          list.innerHTML = `<div class="text-xs text-slate-400 py-1 italic">No reviews yet. Be the first to leave one!</div>`;
           return;
         }
 
         list.innerHTML = reviews.map(r => `
-          <div class="border-b border-archival-divider/60 pb-2 text-xs">
-            <div class="flex items-center justify-between text-[11px] text-archival-muted">
-              <span class="font-medium text-archival-ink">${escapeHtml(r.reviewer_name || 'Scholar')}</span>
-              <span class="text-archival-gold font-mono">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+          <div class="bg-slate-50 p-2.5 rounded border border-slate-200 text-xs">
+            <div class="flex items-center justify-between text-slate-600">
+              <span class="font-bold text-cc-navy">${escapeHtml(r.reviewer_name || 'Reader')}</span>
+              <span class="text-amber-500 font-mono">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
             </div>
-            <p class="text-archival-charcoal mt-1 leading-normal font-serif">${escapeHtml(r.comment || '')}</p>
+            ${r.comment ? `<p class="text-slate-700 mt-1">${escapeHtml(r.comment)}</p>` : ''}
           </div>
         `).join('');
       } catch {
-        document.getElementById('modal-reviews-list').innerHTML = `<div class="text-xs text-archival-muted">Unable to retrieve reviews.</div>`;
+        document.getElementById('modal-reviews-list').innerHTML = `<div class="text-xs text-slate-400">Failed to load reviews.</div>`;
       }
     }
 
     async function handleBorrowModalBook() {
-      if (!currentUser) {
-        showToast('Please sign in or use a demo persona to borrow books', 'error');
-        toggleAuthModal();
-        return;
-      }
       if (!activeModalBook) return;
-
-      try {
-        const res = await fetch(`${API_BASE}/borrows`, {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({ book_id: activeModalBook.id })
-        });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.message || json.error?.message || 'Loan request failed');
-        showToast(`Accession #${activeModalBook.id} loaned to your ledger!`);
-        closeBookModal();
-        await fetchBooks();
-        fetchMyBorrows();
-        fetchDashboard();
-      } catch (err) {
-        showToast(err.message, 'error');
-      }
+      await quickBorrow(activeModalBook.id);
+      closeBookModal();
     }
 
     async function handleReviewSubmit(e) {
       e.preventDefault();
       if (!currentUser) {
-        showToast('Please sign in to submit peer evaluations', 'error');
+        showToast('Please sign in to write a review', 'error');
         toggleAuthModal();
         return;
       }
@@ -984,8 +908,8 @@ Click a route button to test live responses.
           })
         });
         const json = await res.json();
-        if (!res.ok) throw new Error(json.message || json.error?.message || 'Review failed');
-        showToast('Curatorial critique recorded in vault!');
+        if (!res.ok) throw new Error(json.message || 'Review submission failed');
+        showToast('Review submitted!');
         form.reset();
         await fetchModalReviews(activeModalBook.id);
       } catch (err) {
@@ -993,14 +917,14 @@ Click a route button to test live responses.
       }
     }
 
-    // Circulation & Borrows Flows
+    // My Borrows
     async function fetchMyBorrows() {
       const container = document.getElementById('borrows-container');
       if (!currentUser) {
         container.innerHTML = `
-          <div class="p-8 text-center bg-white border border-archival-divider text-archival-muted text-sm space-y-2">
-            <p>Please authenticate to access your personal scholarly lending ledger.</p>
-            <button onclick="toggleAuthModal()" class="text-xs font-mono text-archival-gold hover:underline">Sign In / Switch Persona →</button>
+          <div class="p-8 text-center bg-white rounded-lg border border-cc-border text-slate-500 text-sm space-y-2">
+            <p>You need to be signed in to see your borrowed books.</p>
+            <button onclick="toggleAuthModal()" class="text-xs font-bold text-cc-navy underline">Sign in or use Demo Account →</button>
           </div>
         `;
         return;
@@ -1013,45 +937,43 @@ Click a route button to test live responses.
 
         if (borrows.length === 0) {
           container.innerHTML = `
-            <div class="p-8 text-center bg-white border border-archival-divider text-archival-muted text-sm">
-              No active loans in your ledger. Explore the catalog above to request books.
+            <div class="p-8 text-center bg-white rounded-lg border border-cc-border text-slate-500 text-sm">
+              You haven't borrowed any books yet. Check out the catalog to borrow one!
             </div>
           `;
           return;
         }
 
         container.innerHTML = `
-          <div class="overflow-x-auto bg-white border border-archival-divider">
-            <table class="w-full text-left text-xs font-mono">
-              <thead class="bg-archival-sand/80 border-b border-archival-divider text-archival-muted uppercase tracking-wider text-[10px]">
+          <div class="overflow-x-auto bg-white rounded-lg border border-cc-border">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-mono text-[10px]">
                 <tr>
-                  <th class="p-3">Loan ID</th>
-                  <th class="p-3">Volume Title</th>
+                  <th class="p-3">ID</th>
+                  <th class="p-3">Title</th>
                   <th class="p-3">Author</th>
-                  <th class="p-3">Borrowed At</th>
+                  <th class="p-3">Borrowed On</th>
                   <th class="p-3">Status</th>
                   <th class="p-3 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-archival-divider font-sans">
+              <tbody class="divide-y divide-slate-100">
                 ${borrows.map(b => `
-                  <tr class="hover:bg-archival-paper">
-                    <td class="p-3 font-mono text-xs tabular-nums">#${b.id}</td>
-                    <td class="p-3 font-serif font-semibold text-sm text-archival-ink">${escapeHtml(b.book_title)}</td>
-                    <td class="p-3 text-archival-muted text-xs">${escapeHtml(b.book_author || '')}</td>
-                    <td class="p-3 text-xs font-mono text-archival-muted">${formatDate(b.borrowed_at)}</td>
-                    <td class="p-3 font-mono text-[11px]">
-                      <span class="${b.status === 'BORROWED' ? 'text-archival-amber font-semibold' : 'text-archival-forest font-semibold'}">
-                        ${b.status}
-                      </span>
+                  <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-mono text-slate-400">#${b.id}</td>
+                    <td class="p-3 font-semibold text-cc-navy">${escapeHtml(b.book_title)}</td>
+                    <td class="p-3 text-slate-500">${escapeHtml(b.book_author || '')}</td>
+                    <td class="p-3 font-mono text-slate-500">${formatDate(b.borrowed_at)}</td>
+                    <td class="p-3 font-bold font-mono text-[11px] ${b.status === 'BORROWED' ? 'text-amber-600' : 'text-emerald-600'}">
+                      ${b.status}
                     </td>
                     <td class="p-3 text-right">
                       ${b.status === 'BORROWED' ? `
-                        <button onclick="handleReturnBook(${b.id})" class="px-2.5 py-1 text-xs font-medium text-archival-ink border border-archival-divider hover:border-archival-gold hover:text-archival-gold transition-colors">
-                          Return Volume
+                        <button onclick="handleReturnBook(${b.id})" class="px-2.5 py-1 text-xs font-semibold rounded bg-cc-navy text-white hover:bg-cc-slate transition-colors">
+                          Return Book
                         </button>
                       ` : `
-                        <span class="text-[11px] text-archival-muted font-mono">Returned</span>
+                        <span class="text-slate-400 text-xs font-mono">Returned</span>
                       `}
                     </td>
                   </tr>
@@ -1061,7 +983,7 @@ Click a route button to test live responses.
           </div>
         `;
       } catch (err) {
-        container.innerHTML = `<div class="p-6 text-center text-archival-crimson text-xs">Failed to load borrows: ${err.message}</div>`;
+        container.innerHTML = `<div class="p-6 text-center text-rose-600 text-xs">Failed to load borrows: ${err.message}</div>`;
       }
     }
 
@@ -1072,85 +994,20 @@ Click a route button to test live responses.
           headers: authHeaders()
         });
         const json = await res.json();
-        if (!res.ok) throw new Error(json.message || json.error?.message || 'Return failed');
-        showToast('Volume returned to archival stacks!');
+        if (!res.ok) throw new Error(json.message || 'Return failed');
+        showToast('Book returned successfully!');
         await fetchBooks();
         fetchMyBorrows();
-        fetchDashboard();
       } catch (err) {
         showToast(err.message, 'error');
       }
     }
 
-    // Scholar Dashboard Flow
-    async function fetchDashboard() {
-      const container = document.getElementById('dashboard-container');
-      if (!currentUser) {
-        container.innerHTML = `<p class="text-sm text-archival-muted">Sign in with an account to view reading records, lending stats, and critique history.</p>`;
-        return;
-      }
-
-      try {
-        const res = await fetch(`${API_BASE}/users/me/dashboard`, { headers: authHeaders() });
-        const json = await res.json();
-        const data = json.data;
-        if (!data) return;
-
-        container.innerHTML = `
-          <div class="space-y-6">
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-              <div class="p-4 bg-archival-sand/50 border border-archival-divider">
-                <span class="text-[10px] uppercase font-mono text-archival-muted block">Scholar Identity</span>
-                <span class="font-serif font-bold text-lg text-archival-ink truncate block">${escapeHtml(data.user.name)}</span>
-                <span class="text-xs text-archival-muted block truncate font-mono">${escapeHtml(data.user.email)}</span>
-              </div>
-              <div class="p-4 bg-archival-sand/50 border border-archival-divider text-center">
-                <span class="text-[10px] uppercase font-mono text-archival-muted block">Lifetime Borrows</span>
-                <span class="font-serif font-bold text-2xl text-archival-ink tabular-nums">${data.stats.total_borrows}</span>
-              </div>
-              <div class="p-4 bg-archival-sand/50 border border-archival-divider text-center">
-                <span class="text-[10px] uppercase font-mono text-archival-muted block">Currently Loaned</span>
-                <span class="font-serif font-bold text-2xl text-archival-amber tabular-nums">${data.stats.currently_borrowed}</span>
-              </div>
-              <div class="p-4 bg-archival-sand/50 border border-archival-divider text-center">
-                <span class="text-[10px] uppercase font-mono text-archival-muted block">Avg Critique Given</span>
-                <span class="font-serif font-bold text-2xl text-archival-gold tabular-nums">★ ${data.stats.average_rating_given}</span>
-              </div>
-            </div>
-
-            <div class="space-y-2">
-              <h4 class="text-xs font-mono uppercase text-archival-muted tracking-wider">Recent Loans Activity</h4>
-              ${data.recent_borrows && data.recent_borrows.length > 0 ? `
-                <div class="divide-y divide-archival-divider border border-archival-divider text-xs">
-                  ${data.recent_borrows.map(rb => `
-                    <div class="p-3 flex items-center justify-between bg-white">
-                      <div>
-                        <span class="font-serif font-semibold text-archival-ink">${escapeHtml(rb.book_title)}</span>
-                        <span class="text-archival-muted text-[11px] block">By ${escapeHtml(rb.book_author || '')}</span>
-                      </div>
-                      <div class="text-right font-mono text-[11px]">
-                        <span class="${rb.status === 'BORROWED' ? 'text-archival-amber' : 'text-archival-forest'}">${rb.status}</span>
-                        <span class="text-archival-muted block">${formatDate(rb.borrowed_at)}</span>
-                      </div>
-                    </div>
-                  `).join('')}
-                </div>
-              ` : `
-                <div class="text-xs text-archival-muted py-2 italic font-serif">No recent transactions recorded.</div>
-              `}
-            </div>
-          </div>
-        `;
-      } catch (err) {
-        container.innerHTML = `<div class="text-xs text-archival-crimson">Failed to load dashboard: ${err.message}</div>`;
-      }
-    }
-
-    // Curator Admin Actions
+    // Admin: Create Book
     async function handleCreateBook(e) {
       e.preventDefault();
       if (!currentUser || currentUser.role !== 'ADMIN') {
-        showToast('Curator ADMIN privileges required to accession new books', 'error');
+        showToast('Admin role required! Log in as Curator Eleanor above.', 'error');
         return;
       }
       const form = e.target;
@@ -1167,19 +1024,26 @@ Click a route button to test live responses.
           body: JSON.stringify({ title, author, category, isbn, description: description || undefined })
         });
         const json = await res.json();
-        if (!res.ok) throw new Error(json.message || json.error?.message || 'Accession failed');
-        showToast(`Volume "${title}" deposited into archive stacks!`);
+        if (!res.ok) throw new Error(json.message || 'Failed to add book');
+        showToast(`Book "${title}" added successfully!`);
         form.reset();
         await fetchBooks();
+        switchTab('catalog');
       } catch (err) {
         showToast(err.message, 'error');
       }
     }
 
+    // Admin: Users List
     async function fetchUsersList() {
       const container = document.getElementById('users-table-container');
       if (!currentUser || currentUser.role !== 'ADMIN') {
-        showToast('Please sign in as Curator Eleanor (ADMIN) to inspect users', 'error');
+        container.innerHTML = `
+          <div class="text-center py-6 text-slate-500 text-xs space-y-2">
+            <p>Admin privileges required to view users.</p>
+            <button onclick="quickLogin('curator')" class="px-3 py-1 rounded bg-cc-navy text-white font-semibold">Switch to Admin Account</button>
+          </div>
+        `;
         return;
       }
 
@@ -1189,28 +1053,28 @@ Click a route button to test live responses.
         const users = json.data || [];
 
         container.innerHTML = `
-          <table class="w-full text-left text-xs font-mono border border-archival-divider">
-            <thead class="bg-archival-sand text-archival-muted text-[10px] uppercase">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-slate-50 text-slate-500 text-[10px] uppercase border-b border-slate-200">
               <tr>
                 <th class="p-2.5">ID</th>
-                <th class="p-2.5">Name</th>
+                <th class="p-2.5 font-sans">Name</th>
                 <th class="p-2.5">Email</th>
                 <th class="p-2.5">Role</th>
-                <th class="p-2.5">Total Borrows</th>
-                <th class="p-2.5 text-right">Promote/Demote</th>
+                <th class="p-2.5 text-center">Borrows</th>
+                <th class="p-2.5 text-right">Action</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-archival-divider bg-white">
+            <tbody class="divide-y divide-slate-100">
               ${users.map(u => `
                 <tr>
-                  <td class="p-2.5 tabular-nums">#${u.id}</td>
-                  <td class="p-2.5 font-sans font-medium text-archival-ink">${escapeHtml(u.name)}</td>
-                  <td class="p-2.5 text-archival-muted">${escapeHtml(u.email)}</td>
-                  <td class="p-2.5 font-bold ${u.role === 'ADMIN' ? 'text-archival-amber' : 'text-archival-forest'}">${u.role}</td>
-                  <td class="p-2.5 tabular-nums text-center">${u.total_borrows || 0}</td>
+                  <td class="p-2.5 text-slate-400">#${u.id}</td>
+                  <td class="p-2.5 font-sans font-medium text-cc-navy">${escapeHtml(u.name)}</td>
+                  <td class="p-2.5 text-slate-500">${escapeHtml(u.email)}</td>
+                  <td class="p-2.5 font-bold ${u.role === 'ADMIN' ? 'text-amber-600' : 'text-emerald-600'}">${u.role}</td>
+                  <td class="p-2.5 text-center text-slate-600">${u.total_borrows || 0}</td>
                   <td class="p-2.5 text-right">
-                    <button onclick="toggleUserRole(${u.id}, '${u.role === 'ADMIN' ? 'USER' : 'ADMIN'}')" class="text-archival-gold hover:underline">
-                      Set ${u.role === 'ADMIN' ? 'USER' : 'ADMIN'}
+                    <button onclick="toggleUserRole(${u.id}, '${u.role === 'ADMIN' ? 'USER' : 'ADMIN'}')" class="text-cc-navy font-bold hover:underline">
+                      Make ${u.role === 'ADMIN' ? 'USER' : 'ADMIN'}
                     </button>
                   </td>
                 </tr>
@@ -1219,7 +1083,7 @@ Click a route button to test live responses.
           </table>
         `;
       } catch (err) {
-        container.innerHTML = `<div class="text-xs text-archival-crimson py-4">${err.message}</div>`;
+        container.innerHTML = `<div class="text-xs text-rose-600 py-3">${err.message}</div>`;
       }
     }
 
@@ -1231,15 +1095,15 @@ Click a route button to test live responses.
           body: JSON.stringify({ role: newRole })
         });
         const json = await res.json();
-        if (!res.ok) throw new Error(json.message || json.error?.message || 'Update role failed');
-        showToast(json.message || 'User role updated');
+        if (!res.ok) throw new Error(json.message || 'Update failed');
+        showToast('Role updated successfully');
         fetchUsersList();
       } catch (err) {
         showToast(err.message, 'error');
       }
     }
 
-    // ROUTE INSPECTOR & DIAGNOSTICS
+    // API Route Tester
     const routesManifest = [
       { name: 'GET /books', method: 'GET', url: '/books', auth: false },
       { name: 'GET /books?category=NON_FICTION', method: 'GET', url: '/books?category=NON_FICTION', auth: false },
@@ -1248,16 +1112,16 @@ Click a route button to test live responses.
       { name: 'GET /auth/me', method: 'GET', url: '/auth/me', auth: true },
       { name: 'GET /borrows/my', method: 'GET', url: '/borrows/my', auth: true },
       { name: 'GET /users/me/dashboard', method: 'GET', url: '/users/me/dashboard', auth: true },
-      { name: 'GET /users (Admin)', method: 'GET', url: '/users', auth: true },
+      { name: 'GET /users', method: 'GET', url: '/users', auth: true },
       { name: 'GET /api/health', method: 'GET', url: '/api/health', auth: false },
     ];
 
     function setupRouteButtons() {
       const container = document.getElementById('route-buttons-grid');
       container.innerHTML = routesManifest.map(r => `
-        <button onclick="testRoute('${r.method}', '${r.url}', ${r.auth})" class="p-2 text-left bg-white border border-archival-divider hover:border-archival-gold hover:bg-archival-sand/50 transition-colors flex items-center justify-between">
-          <span class="truncate">${r.name}</span>
-          <span class="text-[10px] text-archival-muted uppercase font-mono">${r.method}</span>
+        <button onclick="testRoute('${r.method}', '${r.url}', ${r.auth})" class="p-2.5 text-left bg-white border border-slate-300 hover:border-cc-navy hover:bg-slate-50 rounded-md transition-colors flex items-center justify-between">
+          <span class="truncate font-semibold text-cc-navy">${r.name}</span>
+          <span class="text-[10px] text-slate-500 uppercase">${r.method}</span>
         </button>
       `).join('');
     }
@@ -1268,8 +1132,9 @@ Click a route button to test live responses.
       const bodyEl = document.getElementById('inspector-body');
 
       endpointEl.innerText = `${method} ${url}`;
-      statusEl.innerText = 'Fetching...';
-      bodyEl.innerText = 'Awaiting response from backend core...';
+      statusEl.innerText = 'WAIT';
+      statusEl.className = 'px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500 text-cc-navy';
+      bodyEl.innerText = '// Sending request...';
 
       const t0 = performance.now();
       try {
@@ -1279,17 +1144,19 @@ Click a route button to test live responses.
         const data = await res.json();
 
         statusEl.innerText = `${res.status} ${res.statusText} (${latency}ms)`;
-        statusEl.className = res.ok ? 'tabular-nums font-bold text-emerald-400' : 'tabular-nums font-bold text-rose-400';
+        statusEl.className = res.ok 
+          ? 'px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500 text-white' 
+          : 'px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500 text-white';
         bodyEl.innerText = JSON.stringify(data, null, 2);
       } catch (err) {
-        statusEl.innerText = 'Network Error';
-        statusEl.className = 'tabular-nums font-bold text-rose-400';
-        bodyEl.innerText = `Error: ${err.message}`;
+        statusEl.innerText = 'ERROR';
+        statusEl.className = 'px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500 text-white';
+        bodyEl.innerText = `// Error: ${err.message}`;
       }
     }
 
     async function runAllRouteDiagnostics() {
-      showToast('Running live route test suite against server...');
+      showToast('Running all endpoints diagnostic test...');
       let passed = 0;
       for (const r of routesManifest) {
         try {
@@ -1298,11 +1165,10 @@ Click a route button to test live responses.
           if (res.ok || (r.auth && !currentToken && res.status === 401)) passed++;
         } catch {}
       }
-      showToast(`Diagnostic Suite Completed: ${passed}/${routesManifest.length} verified`, 'info');
+      showToast(`Diagnostics finished: ${passed}/${routesManifest.length} tests responded OK`);
       testRoute('GET', '/api/health', false);
     }
 
-    // Utility formatting
     function formatDate(iso) {
       if (!iso) return '--';
       try {
@@ -1323,14 +1189,12 @@ Click a route button to test live responses.
         .replace(/'/g, '&#039;');
     }
 
-    // Init on page load
     window.addEventListener('DOMContentLoaded', async () => {
       setupRouteButtons();
       await loadCurrentUser();
       await fetchBooks();
       if (currentToken) {
         fetchMyBorrows();
-        fetchDashboard();
       }
     });
   </script>

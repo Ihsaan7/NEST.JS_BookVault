@@ -22,9 +22,11 @@ async function bootstrap() {
     })
   )
 
-  app.useGlobalFilters(new AllExceptionFilter())
+  app.useGlobalFilters(new AllExceptionFilter());
 
-  await app.listen(process.env.PORT ?? 3000);
-  console.log('🚀 Server running on http://localhost:3000');
+  // In AI Studio, Nginx proxies 8080 to internal port 3000 on 0.0.0.0
+  const port = 3000;
+  await app.listen(port, '0.0.0.0');
+  console.log(`🚀 Server running on http://0.0.0.0:${port}`);
 }
 void bootstrap();
